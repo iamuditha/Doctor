@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background"
+    tools:context=".qr.QRActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan QR Code"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="30dp"
+        android:textSize="25sp"
+        android:layout_alignParentTop="true"
+        />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:gravity="center"
+        android:text="Place QR Code inside the frame to scan \n Avoid shaking to get quick Result"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+
+        <ImageView
+        android:id="@+id/qrholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:padding="0dp"
+            android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_launcher_background"
+            android:foreground="@drawable/box"
+            android:layout_centerVertical="true"/>
+
+
+    <Button
+        android:id="@+id/connectButton"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+        android:background="@drawable/rounded_button_design"
+        android:text="CONNECT"
+        android:visibility="visible"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"/>
+
+    <LinearLayout
+        android:id="@+id/connecting"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
+        >
+
+        <TextView
+            android:layout_alignParentBottom="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="40dp"
+            android:paddingRight="2dp"
+            android:text="Connecting"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+        <com.agrawalsuneet.dotsloader.loaders.TashieLoader
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tashieloader_animDelay="150"
+            app:tashieloader_animDur="150"
+            app:tashieloader_dotsColor="@color/colorPrimaryDark"
+            app:tashieloader_dotsDist="5dp"
+            app:tashieloader_dotsRadius="5dp"
+            app:tashieloader_interpolator="@android:anim/accelerate_interpolator"
+            app:tashieloader_noOfDots="6"
+            android:layout_marginTop="1dp"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+</RelativeLayout>
