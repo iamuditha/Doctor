@@ -4,13 +4,15 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import com.github.nkzawa.socketio.client.IO
+import com.github.nkzawa.socketio.client.Socket
 import com.google.gson.Gson
-import io.socket.client.IO
-import io.socket.client.Socket
-import io.socket.emitter.Emitter
+import okhttp3.OkHttpClient
+
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import javax.net.ssl.SSLContext
 import kotlin.math.floor
 
 
@@ -20,29 +22,32 @@ class ChallengeResponse(private val did: String) {
 
 
     fun challengeResponse(){
+
         Log.i("msg","i am called 1")
         val opts = IO.Options()
+        val sc = SSLContext.getInstance("SSL")
+        sc.init(null,null,null)
         opts.query = "type=patient"
+        opts.reconnection = false
+        opts.port = 8083
+        opts.secure = false
+
+
 
 
         val challenge = getRandomString()?.let { MessageObject(MessageType.CHALLENGE, it) }!!
         val challengeString = MessageSerializerHandler.instance?.serialize(challenge)
         val jsonObject = challengeString?.let { createMessage(did, it) }
-        val socket = IO.socket("http://10.0.0.2:8083", opts)
+        val socket = IO.socket("https://10.10.7.156", opts)
         Log.i("msg","i am called 2")
 
-
-        socket.on(Socket.EVENT_CONNECT, Emitter.Listener() {
-            Log.i("msg","i am called 3")
-
-            socket.emit("sendTo", jsonObject)
-            fun call(vararg objects: Any?) {
+        socket
+            .on(Socket.EVENT_CONNECT) {
+                Log.i("msg","i am called 3")
                 socket.emit("sendTo", jsonObject)
-            }
 
-        }).on("fromServer", Emitter.Listener {
-            fun call(vararg objects: Any?) {
-                val myJSON = objects[0] as JSONObject
+        }.on("fromServer") {parameters ->
+                val myJSON = parameters[0] as JSONObject
                 val id = myJSON.get("id")
                 val msg = myJSON.get("msg")
                 val messageObject: MessageObject = MessageSerializerHandler.instance?.deserialize(
@@ -59,8 +64,8 @@ class ChallengeResponse(private val did: String) {
                     MessageType.TERMINATE -> mTerminate(socket)
                     MessageType.PING -> ping(socket)
                 }
-            }
-        })
+        }
+        socket.on(Socket.EVENT_DISCONNECT) { Log.i("msg", "asdfghjhgfds") }
         socket.connect()
     }
 

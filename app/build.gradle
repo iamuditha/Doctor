@@ -60,7 +60,7 @@ dependencies {
 
     implementation group: 'org.web3j', name: 'core', version: '4.1.0-android'
 
-    implementation group: 'io.socket', name: 'socket.io-client', version: '1.0.0'
+    implementation group: 'com.github.nkzawa', name: 'socket.io-client', version: '0.6.0'
 
 
 
