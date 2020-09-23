@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.doctor.DoctorRegisterActivity
@@ -13,17 +14,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_intro.*
 
 class IntroActivity : AppCompatActivity() {
 
-    private val introScreenRepository =
-        IntroScreenRepository()
+    private val introScreenRepository = IntroScreenRepository()
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private val RC_SIGN_IN = 100;
+    private var RC_AUTHORIZE_DRIVE = 101
+
+    private var ACCESS_DRIVE_SCOPE = Scope(Scopes.DRIVE_FILE)
+    private var SCOPE_EMAIL = Scope(Scopes.EMAIL)
+    private var SCOPE_APP_DATA = Scope(Scopes.DRIVE_APPFOLDER)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,8 +106,34 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun getProfileData (account: GoogleSignInAccount) {
-        Log.i("SignedIn", account.displayName)
-        Log.i("SignedIn", account.email)
+//        Log.i("SignedIn", account.displayName||"no name")
+//        Log.i("SignedIn", account.email)
     }
+
+//    private fun checkForGooglePermissions() {
+//        if (!GoogleSignIn.hasPermissions(
+//                GoogleSignIn.getLastSignedInAccount(applicationContext),
+//                ACCESS_DRIVE_SCOPE,
+//                SCOPE_EMAIL,
+//                SCOPE_APP_DATA
+//            )
+//        ) {
+//            GoogleSignIn.requestPermissions(
+//                this,
+//                RC_AUTHORIZE_DRIVE,
+//                GoogleSignIn.getLastSignedInAccount(applicationContext),
+//                ACCESS_DRIVE_SCOPE,
+//                SCOPE_EMAIL,
+//                SCOPE_APP_DATA
+//            )
+//        } else {
+//            Toast.makeText(
+//                this,
+//                "Permission to access Drive and Email has been granted",
+//                Toast.LENGTH_SHORT
+//            ).show()
+//            driveSetUp()
+//        }
+//    }
 
 }
