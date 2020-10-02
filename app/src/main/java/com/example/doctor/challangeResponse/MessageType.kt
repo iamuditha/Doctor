@@ -6,6 +6,7 @@ enum class MessageType {
     SECRET_KEY,
     TERMINATE,
     PING,
+    VALIDATION,
     CUSTOM
 
 }

@@ -18,7 +18,7 @@ class MessageSerializerHandler private constructor() {
         val b: ByteArray = Base64.getDecoder().decode(serializedMsg.toByteArray())
         val bi = ByteArrayInputStream(b)
         val si = ObjectInputStream(bi)
-        return si.readObject()
+        return si.readObject() as MessageObject
     }
 
     companion object {

@@ -7,20 +7,30 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.doctor.challangeResponse.ChallengeResponse
 import com.example.doctor.qr.QRActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
+import com.google.android.gms.common.api.Scope
+import com.google.api.client.extensions.android.http.AndroidHttp
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.json.gson.GsonFactory
+import com.google.api.services.drive.Drive
 import com.google.gson.Gson
 import crypto.did.DID
 import crypto.did.DIDDocument
 import crypto.did.DIDDocumentGenerator
 import kotlinx.android.synthetic.main.activity_doctor_register.*
-import okhttp3.OkHttpClient
 import org.web3j.crypto.CipherException
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.WalletUtils
 import org.web3j.protocol.Web3j
+import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.http.HttpService
+import utilities.EthFunctions
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.security.InvalidAlgorithmParameterException
@@ -30,44 +40,85 @@ import java.security.NoSuchProviderException
 
 
 class DoctorRegisterActivity : AppCompatActivity() {
-    val challengeResponse = ChallengeResponse("asdfghjhgfdsaadfghjkhgfdsdfghgf")
+
+    private var RC_AUTHORIZE_DRIVE = 101
+    private var ACCESS_DRIVE_SCOPE = Scope(Scopes.DRIVE_FILE)
+    private var SCOPE_EMAIL = Scope(Scopes.EMAIL)
+    private var SCOPE_APP_DATA = Scope(Scopes.DRIVE_APPFOLDER)
+    private var googleDriveService: Drive? = null
+    private var mDriveServiceHelper: DriveServiceHelper? = null
+
+
+    private val challengeResponse = ChallengeResponse("123456789")
+
+
+    // Configure sign-in to request the user's ID, email address, and basic
+    // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+    var gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .build()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doctor_register)
 
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+
+
         //should be generated
-        val myPublicKey = publickKey.text.toString() /***** should be a randomly generated random key **********/
+        val myPublicKey = publickKey.text.toString()
+        /***** should be a randomly generated random key **********/
         Log.i("did", filesDir.absolutePath)
 
-        val web3j : Web3j = Web3j.build(HttpService("https://mainnet.infura.io/v3/898d9e570ec143d6ada30bfdeab9572c"))
+        val web3j: Web3j = Web3j.build(HttpService("https://7548760fd8e9.jp.ngrok.io"))
 
 
         button.setOnClickListener {
 
+//            checkForGooglePermissions()
+
             challengeResponse.challengeResponse()
-//            if (!isDIDDocumentInThePhone()) {
+//            if (true) {
 //                val did = generateDID()
 //                val didDocument = did?.let { it1 -> generateDIDDocument(it1, myPublicKey) }
 //                writeToFile(didDocument!!, "didDocument.json", this)
 //
 //                val hash = hashMessage(didDocument)
 //
-//                val credentials = createWallet("123", filesDir.absolutePath)
-//                Log.i("did","credential done : ${credentials!!.ecKeyPair.privateKey}")
+////                val credentials = createWallet("123", filesDir.absolutePath)
+////                Log.i("did", "credential done : ${credentials!!.address}")
+//                var credentials = WalletUtils.loadCredentials("123","/data/data/com.example.doctor/files/UTC--2020-10-02T08-18-45.1Z--e2312d4ec9d9463f033e8d71bc36588a861ab782.json")
+////                MainContractorHandler.getInstance()
+////                    .getWrapperForMainContractor(
+////                        web3j,
+////                        getString(R.string.main_contractor_address),
+////                        credentials
+////                    )
+////                    .registerDoctor("http://link of the did document", hash,"123456789")
 //
-//                MainContractorHandler.getInstance()
-//                    .getWrapperForMainContractor(web3j,getString(R.string.main_contractor_address),credentials)
-//                    .registerDoctor("http://link of the did document",hash)
+//                val thread1 = Thread(Runnable {
+//                    try {
+//                        val balance = web3j.ethGetBalance("0xe2312d4ec9d9463f033e8d71bc36588a861ab782",DefaultBlockParameterName.LATEST).send().balance
+//                        Log.i("did",balance.toString())
+//                        val mainContractorHandler = MainContractorHandler.getInstance()
+//                        val mainContract = mainContractorHandler.getWrapperForMainContractor(web3j,getString(R.string.main_contractor_address),credentials)
+//                        mainContractorHandler.registerDoctor(mainContract,web3j,"asdf","asdf","123456789",credentials)
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                })
+//                thread1.start()
+//                val thread = Thread(Runnable {
+//                    try {
+//                        Log.i("did", web3j.ethBlockNumber().send().blockNumber.toString())
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                })
 //
-////                val thread = Thread(Runnable {
-////                    try {
-////                        Log.i("did",web3j.ethBlockNumber().send().blockNumber.toString())
-////                    } catch (e: Exception) {
-////                        e.printStackTrace()
-////                    }
-////                })
-////
-////                thread.start()
+//                thread.start()
 //                val intent = Intent(this, QRActivity::class.java)
 //                intent.putExtra("did", did)
 //                startActivity(intent)
@@ -77,9 +128,9 @@ class DoctorRegisterActivity : AppCompatActivity() {
 //                val details = readFromFile("didDocument.json", this)
 //                val did = details!!.subSequence(16, 69)
 //                Log.i("did", "did is $did.toString()")
-//                val intent = Intent(this, QRActivity::class.java)
-//                intent.putExtra("did", did)
-//                startActivity(intent)
+                val intent = Intent(this, QRActivity::class.java)
+                intent.putExtra("did", "123456789")
+                startActivity(intent)
 //            }
         }
 
@@ -99,15 +150,15 @@ class DoctorRegisterActivity : AppCompatActivity() {
     }
 
     private fun generateDID(): String? {
-         try {
+        try {
             val did = DID.getInstance().generateDID()
             Log.i("did", "DID is Generated : DID = $did")
-             return did
+            return did
 
         } catch (e: NoSuchAlgorithmException) {
             e.printStackTrace()
             Log.i("did", "error..............")
-             return e.message
+            return e.message
         }
     }
 
@@ -170,13 +221,14 @@ class DoctorRegisterActivity : AppCompatActivity() {
 
     private fun hashMessage(msg: String): String? {
         val messageDigest = MessageDigest.getInstance("SHA-256")
-        val bytes = messageDigest.digest(msg.toByteArray(StandardCharsets.UTF_8)
+        val bytes = messageDigest.digest(
+            msg.toByteArray(StandardCharsets.UTF_8)
         )
         val sb = java.lang.StringBuilder()
         for (i in bytes.indices) {
-            sb.append((bytes[i].toInt() and  0xff)+ 0x100).substring(1)
+            sb.append((bytes[i].toInt() and 0xff) + 0x100).substring(1)
         }
-        Log.i("did","hash is : ${sb.toString()}")
+        Log.i("did", "hash is : ${sb.toString()}")
         return sb.toString()
     }
 
@@ -187,10 +239,11 @@ class DoctorRegisterActivity : AppCompatActivity() {
         CipherException::class,
         IOException::class
     )
-    fun createWallet( walletPassword: String?, walletDirectory: String): Credentials? {
+    fun createWallet(walletPassword: String?, walletDirectory: String): Credentials? {
         val walletName = WalletUtils.generateBip39Wallet(walletPassword, File(walletDirectory))
         println("wallet location: $walletDirectory/$walletName")
-        val credentials = WalletUtils.loadCredentials(walletPassword, "$walletDirectory/${walletName.filename}")
+        val credentials =
+            WalletUtils.loadCredentials(walletPassword, "$walletDirectory/${walletName.filename}")
         val privateKey = credentials.ecKeyPair.privateKey.toString(16)
         val publicKey = credentials.ecKeyPair.publicKey.toString(16)
         val walletAddress = credentials.address
@@ -200,5 +253,67 @@ class DoctorRegisterActivity : AppCompatActivity() {
         return credentials
     }
 
+    private fun checkForGooglePermissions() {
+        if (!GoogleSignIn.hasPermissions(
+                GoogleSignIn.getLastSignedInAccount(applicationContext),
+                ACCESS_DRIVE_SCOPE,
+                SCOPE_EMAIL,
+                SCOPE_APP_DATA
+            )
+        ) {
+            Toast.makeText(this, "ooops", Toast.LENGTH_SHORT).show()
+            Log.i("logininfo", "oooooooooooooooooooooooooooooooooooops")
+            GoogleSignIn.requestPermissions(
+                this@DoctorRegisterActivity,
+                RC_AUTHORIZE_DRIVE,
+                GoogleSignIn.getLastSignedInAccount(applicationContext),
+                ACCESS_DRIVE_SCOPE,
+                SCOPE_EMAIL,
+                SCOPE_APP_DATA
+            )
+        } else {
+            Toast.makeText(
+                this,
+                "Permission to access Drive and Email has been granted",
+                Toast.LENGTH_SHORT
+            ).show()
+            driveSetUp()
+        }
+    }
+
+    private fun driveSetUp() {
+        val mAccount = GoogleSignIn.getLastSignedInAccount(this@DoctorRegisterActivity)
+        val credential = GoogleAccountCredential.usingOAuth2(
+            applicationContext, setOf(Scopes.DRIVE_APPFOLDER)
+        )
+        credential.selectedAccount = mAccount!!.account
+        googleDriveService = Drive.Builder(
+            AndroidHttp.newCompatibleTransport(),
+            GsonFactory(),
+            credential
+        )
+            .setApplicationName("GoogleDriveIntegration 3")
+            .build()
+        val mGoogleDriveService = googleDriveService
+        mDriveServiceHelper = mGoogleDriveService?.let { DriveServiceHelper(it) }
+    }
+
+    fun createFolderInDrive() {
+        Log.i("logininfo", "Creating a Folder...")
+        mDriveServiceHelper!!.createFolder("DID Folder", null)
+            .addOnSuccessListener { googleDriveFileHolder ->
+                val gson = Gson()
+                Log.i(
+                    "logininfo",
+                    "onSuccess c of Folder creation: " + gson.toJson(googleDriveFileHolder)
+                )
+            }
+            .addOnFailureListener { e ->
+                Log.i(
+                    "logininfo",
+                    "onFailure of Folder creation: " + e.message
+                )
+            }
+    }
 }
 

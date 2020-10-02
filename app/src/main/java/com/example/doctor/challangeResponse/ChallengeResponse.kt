@@ -18,41 +18,31 @@ import kotlin.math.floor
 
 class ChallengeResponse(private val did: String) {
 
-    private var isValidated : Boolean = false
+    private var isValidated: Boolean = false
 
 
-    fun challengeResponse(){
+    fun challengeResponse() {
 
-        Log.i("msg","i am called 1")
         val opts = IO.Options()
-        val sc = SSLContext.getInstance("SSL")
-        sc.init(null,null,null)
-        opts.query = "type=patient"
-        opts.reconnection = false
-        opts.port = 8083
-        opts.secure = false
-
-
+        opts.query = "type=doctor&&did=${did}"
 
 
         val challenge = getRandomString()?.let { MessageObject(MessageType.CHALLENGE, it) }!!
         val challengeString = MessageSerializerHandler.instance?.serialize(challenge)
         val jsonObject = challengeString?.let { createMessage(did, it) }
-        val socket = IO.socket("https://10.10.7.156", opts)
-        Log.i("msg","i am called 2")
+        val socket = IO.socket("https://2141575b3928.ngrok.io", opts)
 
         socket
             .on(Socket.EVENT_CONNECT) {
-                Log.i("msg","i am called 3")
-                socket.emit("sendTo", jsonObject)
+                //socket.emit("sendTo", jsonObject)
 
-        }.on("fromServer") {parameters ->
+            }.on("fromServer") { parameters ->
                 val myJSON = parameters[0] as JSONObject
                 val id = myJSON.get("id")
                 val msg = myJSON.get("msg")
-                val messageObject: MessageObject = MessageSerializerHandler.instance?.deserialize(
-                    msg as String
-                ) as MessageObject
+                Log.i("msg", msg as String)
+//                val mObject = MessageObject()
+                val messageObject: MessageObject = MessageSerializerHandler.instance?.deserialize(msg) as MessageObject
                 when (messageObject.getType()) {
                     MessageType.CHALLENGE -> challengeHandler(
                         socket,
@@ -64,7 +54,7 @@ class ChallengeResponse(private val did: String) {
                     MessageType.TERMINATE -> mTerminate(socket)
                     MessageType.PING -> ping(socket)
                 }
-        }
+            }
         socket.on(Socket.EVENT_DISCONNECT) { Log.i("msg", "asdfghjhgfds") }
         socket.connect()
     }
@@ -85,8 +75,9 @@ class ChallengeResponse(private val did: String) {
         //decrypt with private key
 
         //encrypt with private key
-        val decryptionMsg : String = ""
-        socket.emit("sendTo", createMessage(id, decryptionMsg))
+        val decryptionMsg: String = ""
+        Log.i("did",challenge)
+        socket.emit("sendTo", createMessage(id, challenge))
     }
 
     private fun secretKeyHandler() {
@@ -94,7 +85,7 @@ class ChallengeResponse(private val did: String) {
     }
 
     private fun mTerminate(socket: Socket) {
-        isValidated =false
+        isValidated = false
         socket.emit(
             "sendTo", createMessage(
                 did,
@@ -130,7 +121,7 @@ class ChallengeResponse(private val did: String) {
         try {
             jsonObject.put("id", id)
             jsonObject.put("msg", message)
-        }catch (e: JSONException){
+        } catch (e: JSONException) {
             Log.i("message", e.printStackTrace().toString())
         }
         return jsonObject
