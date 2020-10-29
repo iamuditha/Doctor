@@ -1,8 +1,10 @@
 package com.example.doctor.introScreen
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +12,7 @@ import androidx.viewpager.widget.ViewPager
 import com.example.doctor.DoctorRegisterActivity
 import com.example.doctor.qr.QRActivity
 import com.example.doctor.R
+import com.example.doctor.recordList.RecordListActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -20,6 +23,7 @@ import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_intro.*
+import java.io.File
 
 class IntroActivity : AppCompatActivity() {
 
@@ -27,6 +31,7 @@ class IntroActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private val RC_SIGN_IN = 100;
     private var RC_AUTHORIZE_DRIVE = 101
+
 
     private var ACCESS_DRIVE_SCOPE = Scope(Scopes.DRIVE_FILE)
     private var SCOPE_EMAIL = Scope(Scopes.EMAIL)
@@ -77,7 +82,7 @@ class IntroActivity : AppCompatActivity() {
         val account = GoogleSignIn.getLastSignedInAccount(this)
         account?.let { getProfileData(it) }
         if (account != null) {
-            val intent = Intent(this, DoctorRegisterActivity::class.java)
+            val intent = Intent(this, RecordListActivity::class.java)/********************************************************************/
             startActivity(intent)
         }
     }
@@ -97,7 +102,7 @@ class IntroActivity : AppCompatActivity() {
             val account = completedTask.getResult(ApiException::class.java)
             account?.let { getProfileData(it) }
             // Signed in successfully, show authenticated UI.
-            val intent = Intent(this, DoctorRegisterActivity::class.java)
+            val intent = Intent(this, RecordListActivity::class.java) /*******************************************************************/
             startActivity(intent)
         } catch (e: ApiException) {
             Log.w("SignedIn", "signInResult:failed code=" + e.statusCode)
@@ -135,5 +140,7 @@ class IntroActivity : AppCompatActivity() {
 //            driveSetUp()
 //        }
 //    }
+
+
 
 }

@@ -7,105 +7,95 @@ import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
+import com.google.api.services.drive.model.Permission
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 class DriveServiceHelper(private val mDriveService: Drive) {
-    private val mExecutor: Executor =
-        Executors.newSingleThreadExecutor()
 
-    /**
-     * Creates a text file in the user's My Drive folder and returns its file ID.
-     */
-    fun createFile(
-        folderId: String?,
-        filename: String?
-    ): Task<GoogleDriveFileHolder> {
+    private val mExecutor: Executor = Executors.newSingleThreadExecutor()
+
+    //creating a new file in the google drive
+    fun createFile(folderId: String?, filename: String?): Task<GoogleDriveFileHolder> {
         return Tasks.call<GoogleDriveFileHolder>(mExecutor,
             Callable<GoogleDriveFileHolder> {
                 val googleDriveFileHolder = GoogleDriveFileHolder()
                 val root: List<String> = folderId?.let { listOf(it) } ?: listOf("root")
-                val metadata =
-                    File()
-                        .setParents(root)
-                        .setMimeType("text/plain")
-                        .setName(filename)
-                val googleFile =
-                    mDriveService.files().create(metadata).execute()
-                        ?: throw IOException("Null result when requesting file creation.")
+                val metadata = File()
+                    .setParents(root)
+                    .setMimeType("text/plain")
+                    .setName(filename)
+                    .setWritersCanShare(true)
+                val googleFile = mDriveService.files().create(metadata).execute()
+                    ?: throw IOException("Null result when requesting file creation.")
                 googleDriveFileHolder.setId(googleFile.id)
                 googleDriveFileHolder
             }
         )
     }
 
-    // TO CREATE A FOLDER
-    fun createFolder(
-        folderName: String?,
-        folderId: String?
-    ): Task<GoogleDriveFileHolder> {
+    // create a new folder in the google drive
+    fun createFolder(folderName: String?, folderId: String?): Task<GoogleDriveFileHolder> {
+
+        val permission = Permission()
+            .setRole("owner")
+            .setType("anyone")
         return Tasks.call<GoogleDriveFileHolder>(mExecutor,
             Callable<GoogleDriveFileHolder> {
                 val googleDriveFileHolder = GoogleDriveFileHolder()
                 val root: List<String> = folderId?.let { listOf(it) } ?: listOf("root")
-                val metadata =
-                    File()
-                        .setParents(root)
-                        .setMimeType("application/vnd.google-apps.folder")
-                        .setName(folderName)
-                val googleFile =
-                    mDriveService.files().create(metadata).execute()
-                        ?: throw IOException("Null result when requesting file creation.")
+                val metadata = File()
+                    .setParents(root)
+                    .setMimeType("application/vnd.google-apps.folder")
+                    .setName(folderName)
+
+                val googleFile = mDriveService.files().create(metadata).execute()
+                    ?: throw IOException("Null result when requesting file creation.")
                 googleDriveFileHolder.setId(googleFile.id)
                 googleDriveFileHolder
             }
         )
     }
 
-//    fun downloadFile(
-//        targetFile: java.io.File?,
-//        fileId: String?
-//    ): Task<Void?> {
-//        return Tasks.call(
-//            mExecutor,
-//            Callable {
-//
-//
-//                // Retrieve the metadata as a File object.
-//                val outputStream: OutputStream = FileOutputStream(targetFile)
-//                mDriveService.files()[fileId].executeMediaAndDownloadTo(outputStream)
-//                null
-//            }
-//        )
-//    }
+    //download a file from the google drive
+    fun downloadFile(targetFile: java.io.File?, fileId: String?): Task<Nothing?>? {
+        return Tasks.call(
+            mExecutor,
+            Callable {
+                val outputStream: OutputStream = FileOutputStream(targetFile)
+                mDriveService.files()[fileId].executeMediaAndDownloadTo(outputStream)
+                null
+            }
+        )
+    }
 
-//    fun deleteFolderFile(fileId: String?): Task<Void?> {
-//        return Tasks.call(
-//            mExecutor,
-//            Callable {
-//
-//
-//                // Retrieve the metadata as a File object.
-//                if (fileId != null) {
-//                    mDriveService.files().delete(fileId).execute()
-//                }
-//                null
-//            }
-//        )
-//    }
+    //delete a folder with/without files in google drive
+    fun deleteFolderFile(fileId: String?): Task<Nothing?>? {
+        return Tasks.call(
+            mExecutor,
+            Callable {
+                if (fileId != null) {
+                    mDriveService.files().delete(fileId).execute()
+                }
+                null
+            }
+        )
+    }
 
-    // TO LIST FILES
+    // listing the files in the google drive created by the application
     @Throws(IOException::class)
     fun listDriveImageFiles(): MutableList<File>? {
         var result: FileList
         var pageToken: String? = null
         do {
             result = mDriveService.files()
-                .list() /*.setQ("mimeType='image/png' or mimeType='text/plain'")This si to list both image and text files. Mind the type of image(png or jpeg).setQ("mimeType='image/png' or mimeType='text/plain'") */
+                .list()
                 .setSpaces("drive")
-                .setFields("nextPageToken, files(id, name)")
+                .setFields("nextPageToken, files(id,name,webContentLink,shared,permissions)")
                 .setPageToken(pageToken)
                 .execute()
             pageToken = result.nextPageToken
@@ -113,22 +103,16 @@ class DriveServiceHelper(private val mDriveService: Drive) {
         return result.files
     }
 
-    // TO UPLOAD A FILE ONTO DRIVE
-    fun uploadFile(
-        localFile: java.io.File,
-        mimeType: String?, folderId: String?
-    ): Task<Any>? {
+    // upload a file in to google drive
+    fun uploadFile(localFile: java.io.File, mimeType: String?, folderId: String?): Task<Any>? {
         return Tasks.call(mExecutor, Callable<Any> { // Retrieve the metadata as a File object.
-            val root: List<String>
-            root = folderId?.let { listOf(it) } ?: listOf("root")
-            val metadata =
-                File()
+            val root: List<String> = folderId?.let { listOf(it) } ?: listOf("root")
+            val metadata = File()
                     .setParents(root)
                     .setMimeType(mimeType)
                     .setName(localFile.name)
             val fileContent = FileContent(mimeType, localFile)
-            val fileMeta =
-                mDriveService.files().create(
+            val fileMeta = mDriveService.files().create(
                     metadata,
                     fileContent
                 ).execute()
@@ -138,10 +122,6 @@ class DriveServiceHelper(private val mDriveService: Drive) {
             googleDriveFileHolder
         })
     }
-//
-//    private val mExecutor: Executor =
-//        Executors.newSingleThreadExecutor()
-//    private var mDriveService: Drive? = null
 
 
     fun createFilePdf(filePath: String?): Task<String>? {

@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,10 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DoctorRegisterActivity"></activity>
-        <activity android:name=".fullScreenRecord.FullScreenRecordActivity" />
-        <activity android:name=".recordList.RecordListActivity" />
-        <activity android:name=".introScreen.IntroActivity">
+        <activity
+            android:name=".DoctorRegisterActivity"
+            android:screenOrientation="sensorPortrait" />
+        <activity
+            android:name=".fullScreenRecord.FullScreenRecordActivity"
+            android:screenOrientation="sensorPortrait" />
+        <activity
+            android:name=".recordList.RecordListActivity"
+            android:screenOrientation="sensorPortrait" />
+        <activity
+            android:name=".introScreen.IntroActivity"
+            android:screenOrientation="sensorPortrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +32,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".qr.QRActivity" />
-        <activity android:name=".GoogleSignInActivity" />
     </application>
 
 </manifest>

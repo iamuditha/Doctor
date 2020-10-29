@@ -7,19 +7,19 @@ class IntroScreenRepository {
     fun fetchTabLayoutData(): ArrayList<ScreenItem> {
         return arrayListOf(
             ScreenItem(
-                "Fresh Food",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-                R.drawable.img1
+                "Easy Authentication",
+                "Provide you a Digital Identity and Verify your Identity to the  Patient Using a Decentralized Identity Management Process",
+                R.raw.authentication_animation
             ),
             ScreenItem(
-                "Fast Delivery",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-                R.drawable.img2
+                "Lots of records",
+                "Access and View Patient's Full Medical History using ",
+                R.raw.medical_history_animation
             ),
             ScreenItem(
-                "Easy Payment",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-                R.drawable.img3
+                "Quick Sorting",
+                "Sort and Filter Test Reports based on the Test Type and the Date of Uploaded",
+                R.raw.sort_animation
             )
         )
     }

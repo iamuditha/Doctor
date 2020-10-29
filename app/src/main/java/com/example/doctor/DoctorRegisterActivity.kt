@@ -2,15 +2,16 @@ package com.example.doctor
 
 //import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256
 
-import ContractorHandlers.MainContractorHandler
 import android.content.Context
-import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.loader.content.AsyncTaskLoader
 import com.example.doctor.challangeResponse.ChallengeResponse
-import com.example.doctor.qr.QRActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.Scopes
@@ -28,15 +29,17 @@ import org.web3j.crypto.CipherException
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.WalletUtils
 import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.http.HttpService
-import utilities.EthFunctions
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.security.InvalidAlgorithmParameterException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
+import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 
 class DoctorRegisterActivity : AppCompatActivity() {
@@ -47,13 +50,16 @@ class DoctorRegisterActivity : AppCompatActivity() {
     private var SCOPE_APP_DATA = Scope(Scopes.DRIVE_APPFOLDER)
     private var googleDriveService: Drive? = null
     private var mDriveServiceHelper: DriveServiceHelper? = null
+    private val mExecutor: Executor = Executors.newSingleThreadExecutor()
+    private var list: List<String> = ArrayList()
+    private val REQUEST_IMAGE_CAPTURE: Int = 100
+
 
 
     private val challengeResponse = ChallengeResponse("123456789")
 
 
-    // Configure sign-in to request the user's ID, email address, and basic
-    // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+    //configure the google sign in
     var gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
         .build()
@@ -61,25 +67,33 @@ class DoctorRegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doctor_register)
+        checkForGooglePermissions()
+
 
 
         // Build a GoogleSignInClient with the options specified by gso.
         val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
+        //randomly generated string for the DID
+        val myPublicKey =  UUID.randomUUID().toString().substring(0,8)
 
-        //should be generated
-        val myPublicKey = publickKey.text.toString()
-        /***** should be a randomly generated random key **********/
         Log.i("did", filesDir.absolutePath)
 
         val web3j: Web3j = Web3j.build(HttpService("https://7548760fd8e9.jp.ngrok.io"))
 
 
         button.setOnClickListener {
+            downloadFile()
+//            getPermission()
+
+
+//            getURL(googleDriveService.files()[])
 
 //            checkForGooglePermissions()
-
-            challengeResponse.challengeResponse()
+//            createFolderInDrive()
+//            uploadFileToDrive()
+//            listFilesInDrive()
+//            challengeResponse.challengeResponse()
 //            if (true) {
 //                val did = generateDID()
 //                val didDocument = did?.let { it1 -> generateDIDDocument(it1, myPublicKey) }
@@ -128,9 +142,9 @@ class DoctorRegisterActivity : AppCompatActivity() {
 //                val details = readFromFile("didDocument.json", this)
 //                val did = details!!.subSequence(16, 69)
 //                Log.i("did", "did is $did.toString()")
-                val intent = Intent(this, QRActivity::class.java)
-                intent.putExtra("did", "123456789")
-                startActivity(intent)
+//                val intent = Intent(this, QRActivity::class.java)
+//                intent.putExtra("did", "123456789")
+//                startActivity(intent)
 //            }
         }
 
@@ -142,6 +156,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         //upload the link to the block chain
     }
 
+    //convert the did document in to JSON format
     private fun convertToJSON(didDocument: DIDDocument): String {
         val gson = Gson()
         val json: String = gson.toJson(didDocument)
@@ -149,6 +164,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         return json
     }
 
+    //generate the DID as a string
     private fun generateDID(): String? {
         try {
             val did = DID.getInstance().generateDID()
@@ -162,6 +178,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         }
     }
 
+    //generate the did document data and convert it to JSON format
     private fun generateDIDDocument(did: String, publicKey: String): String {
         return try {
             val didDocument = DIDDocumentGenerator.getInstance().generateDIDDocument(did, publicKey)
@@ -175,6 +192,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         }
     }
 
+    //write a string to a file
     private fun writeToFile(data: String, fileName: String, context: Context) {
         try {
             val outputStreamWriter =
@@ -188,6 +206,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         }
     }
 
+    //read the file content as a string
     private fun readFromFile(fileName: String, context: Context): String? {
         var mText = ""
         try {
@@ -213,17 +232,17 @@ class DoctorRegisterActivity : AppCompatActivity() {
         return mText
     }
 
+    //check whether the previously created DID document is in the mobile device
     private fun isDIDDocumentInThePhone(): Boolean {
         val file = File(applicationContext.filesDir, "didDocument.json")
         Log.e("did", "Is there a DID document in the mobile: ${file.exists()}")
         return file.exists()
     }
 
+    //generate the hash of a string using SHA-256
     private fun hashMessage(msg: String): String? {
         val messageDigest = MessageDigest.getInstance("SHA-256")
-        val bytes = messageDigest.digest(
-            msg.toByteArray(StandardCharsets.UTF_8)
-        )
+        val bytes = messageDigest.digest(msg.toByteArray(StandardCharsets.UTF_8))
         val sb = java.lang.StringBuilder()
         for (i in bytes.indices) {
             sb.append((bytes[i].toInt() and 0xff) + 0x100).substring(1)
@@ -232,6 +251,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         return sb.toString()
     }
 
+    //create a wallet
     @Throws(
         NoSuchAlgorithmException::class,
         NoSuchProviderException::class,
@@ -253,6 +273,7 @@ class DoctorRegisterActivity : AppCompatActivity() {
         return credentials
     }
 
+    //check if the device has google permission to access the google services
     private fun checkForGooglePermissions() {
         if (!GoogleSignIn.hasPermissions(
                 GoogleSignIn.getLastSignedInAccount(applicationContext),
@@ -261,7 +282,6 @@ class DoctorRegisterActivity : AppCompatActivity() {
                 SCOPE_APP_DATA
             )
         ) {
-            Toast.makeText(this, "ooops", Toast.LENGTH_SHORT).show()
             Log.i("logininfo", "oooooooooooooooooooooooooooooooooooops")
             GoogleSignIn.requestPermissions(
                 this@DoctorRegisterActivity,
@@ -272,15 +292,11 @@ class DoctorRegisterActivity : AppCompatActivity() {
                 SCOPE_APP_DATA
             )
         } else {
-            Toast.makeText(
-                this,
-                "Permission to access Drive and Email has been granted",
-                Toast.LENGTH_SHORT
-            ).show()
             driveSetUp()
         }
     }
 
+    //request the google drive permission for the device
     private fun driveSetUp() {
         val mAccount = GoogleSignIn.getLastSignedInAccount(this@DoctorRegisterActivity)
         val credential = GoogleAccountCredential.usingOAuth2(
@@ -298,9 +314,11 @@ class DoctorRegisterActivity : AppCompatActivity() {
         mDriveServiceHelper = mGoogleDriveService?.let { DriveServiceHelper(it) }
     }
 
-    fun createFolderInDrive() {
+
+    //create folder in the drive
+    private fun createFolderInDrive() {
         Log.i("logininfo", "Creating a Folder...")
-        mDriveServiceHelper!!.createFolder("DID Folder", null)
+        mDriveServiceHelper!!.createFolder("bif DID Folder", null)
             .addOnSuccessListener { googleDriveFileHolder ->
                 val gson = Gson()
                 Log.i(
@@ -314,6 +332,110 @@ class DoctorRegisterActivity : AppCompatActivity() {
                     "onFailure of Folder creation: " + e.message
                 )
             }
+    }
+
+    private fun downloadFile(){
+        mDriveServiceHelper!!.downloadFile(File(Environment.getExternalStorageDirectory().toString()+"/uditha.crypt/"),"1pfaZSJDtex763-8vyTF-Z8uAl4dqAwMZ")
+            ?.addOnSuccessListener { googleDriveFileHolder ->
+                val gson = Gson()
+                Log.i(
+                    "logininfo",
+                    "onSuccess c of Folder creation: " + gson.toJson(googleDriveFileHolder)
+                )
+            }
+            ?.addOnFailureListener { e ->
+                Log.i(
+                    "logininfo",
+                    "onFailure of Folder creation: " + e.message
+                )
+            }
+    }
+
+    //list the files in the drive
+    private fun listFilesInDrive() {
+
+        val thread = Thread(Runnable {
+            try {
+                if (mDriveServiceHelper == null) {
+                    Log.i("logininfo", "this is null")
+                    checkForGooglePermissions()
+                }
+                var fileList = mDriveServiceHelper?.listDriveImageFiles()
+                Log.i("logininfo", fileList!!.size.toString())
+                Log.i("logininfo", fileList!![0].toString())
+                Log.i("logininfo", fileList!![1].toString())
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+        thread.start()
+
+
+    }
+
+    //upload a file to the drive
+    private fun uploadFileToDrive() {
+        val file = File(applicationContext.filesDir, "didDocument.json")
+        mDriveServiceHelper!!.uploadFile(file, "application/json", null)
+            ?.addOnSuccessListener { googleDriveFileHolder ->
+                val gson = Gson()
+                Log.i(
+                    "logininfo",
+                    "on success File download" + gson.toJson(googleDriveFileHolder)
+                )
+            }
+            ?.addOnFailureListener { e ->
+                Log.i(
+                    "logininfo",
+                    "on failure of file download" + e.message
+                )
+            }
+    }
+
+    fun setList(list: List<String?>?) {
+        this.list = list as List<String>
+    }
+
+    fun getURL(file: com.google.api.services.drive.model.File): String {
+        val link = file.webContentLink
+        return "link"
+    }
+
+    private fun getPermission() {
+        //if the system is marshmallow or above get the run time permission
+        if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
+            checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+        ) {
+            //permission was not enabled
+            val permission = arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            //show popup to request permission
+            requestPermissions(permission, REQUEST_IMAGE_CAPTURE)
+
+        } else {
+            //permission already granted
+//            val path = Environment.getExternalStorageDirectory().toString() +"/Eee.jpg/"
+
+//            try {
+//                val fileOutputStream = FileInputStream(path)
+//                Log.i("encrypting", "image found")
+//
+//                val suc = Encdec().encryptFile(
+//                    fileOutputStream,
+//                    Environment.getExternalStorageDirectory().toString()
+//                )
+//                Log.i("encrypting", suc.toString())
+//
+//            }catch (e: Exception){
+//                Log.i("encrypting", e.toString())
+//            }
+
+
+
+        }
     }
 }
 
