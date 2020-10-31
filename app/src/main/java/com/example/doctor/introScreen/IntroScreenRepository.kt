@@ -19,7 +19,7 @@ class IntroScreenRepository {
             ScreenItem(
                 "Quick Sorting",
                 "Sort and Filter Test Reports based on the Test Type and the Date of Uploaded",
-                R.raw.sort_animation
+                R.raw.sort_animation_new
             )
         )
     }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".recordList.RecordListActivity"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+
+    <AutoCompleteTextView
+        android:id="@+id/autoComplete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter the test Name you want to Search"
+        android:padding="10dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/rounded_corners"/>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/from"
+        android:clickable="true"
+        android:hint="From"
+        android:focusable="false"
+        android:longClickable="false"
+        android:padding="10dp"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_corners"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TO"/>
+
+    <EditText
+        android:id="@+id/to"
+        android:clickable="true"
+        android:hint="To"
+        android:focusable="false"
+        android:longClickable="false"
+        android:padding="10dp"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_corners"/>
+</LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+</LinearLayout>

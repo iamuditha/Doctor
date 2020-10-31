@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
@@ -40,6 +41,8 @@ class IntroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_intro)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
 
         // get intro screen tab layout data
         val mList = introScreenRepository.fetchTabLayoutData()
@@ -82,7 +85,7 @@ class IntroActivity : AppCompatActivity() {
         val account = GoogleSignIn.getLastSignedInAccount(this)
         account?.let { getProfileData(it) }
         if (account != null) {
-            val intent = Intent(this, RecordListActivity::class.java)/********************************************************************/
+            val intent = Intent(this, DoctorRegisterActivity::class.java)/********************************************************************/
             startActivity(intent)
         }
     }
@@ -102,7 +105,7 @@ class IntroActivity : AppCompatActivity() {
             val account = completedTask.getResult(ApiException::class.java)
             account?.let { getProfileData(it) }
             // Signed in successfully, show authenticated UI.
-            val intent = Intent(this, RecordListActivity::class.java) /*******************************************************************/
+            val intent = Intent(this, DoctorRegisterActivity::class.java) /*******************************************************************/
             startActivity(intent)
         } catch (e: ApiException) {
             Log.w("SignedIn", "signInResult:failed code=" + e.statusCode)

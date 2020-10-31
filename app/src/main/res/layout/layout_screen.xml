@@ -43,7 +43,6 @@
         android:gravity="center_horizontal"
         android:lineSpacingExtra="16dp"
         android:text="TextView"
-        android:textStyle="bold"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -68,7 +67,7 @@
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/intro_animation"
         android:layout_width="wrap_content"
-        android:layout_height="222dp"
+        android:layout_height="300dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"

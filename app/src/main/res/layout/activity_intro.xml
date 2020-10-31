@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/medbg"
+    android:background="@android:color/white"
+    android:clipToPadding="false"
     tools:context=".introScreen.IntroActivity">
 
     <androidx.viewpager.widget.ViewPager
@@ -39,10 +40,11 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="33dp"
+        android:elevation="10dp"
         app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:tabBackground="@drawable/indicator_selector"></com.google.android.material.tabs.TabLayout>
+        app:tabBackground="@drawable/indicator_selector" />
 
 <!--    <Button-->
 <!--        android:id="@+id/btn_get_started"-->
@@ -60,18 +62,19 @@
 <!--        app:layout_constraintStart_toStartOf="parent" />-->
     <com.shobhitpuri.custombuttons.GoogleSignInButton
         android:id="@+id/sign_in_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
         android:layout_marginBottom="64dp"
+        android:elevation="100dp"
+        android:outlineProvider="bounds"
         android:text="@string/google_sign_up"
         app:isDarkTheme="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 <!--    <TextView-->
 <!--        android:textSize="16sp"-->
 <!--        android:textStyle="bold"-->

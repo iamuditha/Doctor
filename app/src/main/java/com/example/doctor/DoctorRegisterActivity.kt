@@ -3,6 +3,7 @@ package com.example.doctor
 //import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.loader.content.AsyncTaskLoader
 import com.example.doctor.challangeResponse.ChallengeResponse
+import com.example.doctor.qr.QRActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.Scopes
@@ -83,7 +85,11 @@ class DoctorRegisterActivity : AppCompatActivity() {
 
 
         button.setOnClickListener {
-            downloadFile()
+            val intent = Intent(this, QRActivity::class.java)
+            intent.putExtra("did", "this is a did")
+            startActivity(intent)
+
+//            downloadFile()
 //            getPermission()
 
 
