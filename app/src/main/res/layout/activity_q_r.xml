@@ -7,18 +7,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/colorPrimary"
+    android:background="#FFFFFF"
     tools:context=".qr.QRActivity">
 
     <TextView
-        android:layout_marginTop="15dp"
-        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text="Please Allow the Patient to Scan Your QR code to Verify your Profile"
-        android:textColor="@android:color/white"
-        android:textSize="15sp"
+        android:padding="10dp"
+        android:text="Please Allow the Patient to Scan Your QR Code to Verify Your Profile"
+        android:textColor="@color/intro_title_color"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
 
@@ -39,61 +39,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:padding="0dp"
+        android:padding="10dp"
         android:src="@drawable/ic_launcher_background"
         android:layout_centerVertical="true"/>
 
     <com.airbnb.lottie.LottieAnimationView
-       android:layout_weight="1"
         android:id="@+id/qrAnimation"
         android:layout_width="wrap_content"
-        android:layout_height="450dp"
-        android:padding="0dp" android:layout_centerHorizontal="true"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:layout_weight="1"
+        android:background="#4A03A9F4"
+        android:padding="2dp"
+        android:layout_marginBottom="15dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/qr_animation"
-        />
+        app:lottie_rawRes="@raw/qr_animation" />
+
+    <Button
+        android:id="@+id/hide"
+        android:layout_width="17dp"
+        android:layout_height="12dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorPrimaryDark"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="Hide"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/rounded_button_design_blue"
+        android:background="@color/colorPrimaryDark"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="View My QR Code"
         android:textColor="@android:color/white" />
-
-    <Button
-        android:id="@+id/hide"
-        android:visibility="gone"
-        android:background="@drawable/rounded_button_design_blue"
-        android:textColor="@android:color/white"
-        android:text="Hide"
-        android:layout_marginBottom="10dp"
-        android:paddingRight="30dp"
-        android:paddingLeft="30dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
 
 </LinearLayout>
 
 
     <Button
         android:id="@+id/connectButton"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="1dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:paddingRight="40dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/colorPrimaryDark"
         android:paddingLeft="40dp"
-        android:background="@drawable/rounded_button_design_white"
+        android:paddingRight="40dp"
         android:text="CONNECT WITH PATIENT"
-        android:visibility="visible"
-        android:textColor="@color/colorPrimary"
-        android:textSize="15sp"/>
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:visibility="visible" />
 
 
 
