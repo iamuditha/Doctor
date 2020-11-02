@@ -15,51 +15,53 @@
         android:padding="8dp">
 
         <TextView
+            android:id="@+id/tv_alert"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
             android:text="This is Alert Dialog"
+            android:textColor="@color/intro_description_color"
             android:textSize="18sp"
-            android:id="@+id/tv_alert"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="3dp"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
+            android:id="@+id/et_name"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="5dp"
-            app:layout_constraintStart_toEndOf="@id/tv_alert"
-            android:hint="Name"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
             android:background="@null"
-            android:id="@+id/et_name"
-            android:layout_marginLeft="5dp"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:hint="Name"
+            app:layout_constraintStart_toEndOf="@id/tv_alert"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
+            android:id="@+id/btn_ok"
             android:layout_width="wrap_content"
-            android:background="@drawable/rounded_button_design_blue"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lottie_anim"
+            android:layout_marginTop="28dp"
+            android:background="@color/colorPrimaryDark"
             android:text="STOP"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="5dp"
             android:textAllCaps="false"
-            android:id="@+id/btn_ok"/>
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lottie_anim" />
 
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_anim"
             android:layout_width="200dp"
             android:layout_height="80dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="28dp"
+            android:adjustViewBounds="true"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_alert"
-            android:layout_marginTop="10dp"
-            android:id="@+id/lottie_anim"
-            app:lottie_autoPlay="true"
-            android:adjustViewBounds="true"/>
+            app:lottie_autoPlay="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

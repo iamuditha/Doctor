@@ -10,14 +10,14 @@
     tools:context=".splashScreen.SplashScreenActivity">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:layout_width="wrap_content"
-        app:lottie_rawRes="@raw/splash_animation_new"
-        android:layout_height="wrap_content"
+        android:layout_width="201dp"
+        android:layout_height="173dp"
         android:layout_gravity="center"
         app:lottie_autoPlay="true"
-        app:lottie_loop="true"/>
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/splash_animation_new" />
 
-<LinearLayout
+    <LinearLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -32,6 +32,7 @@
         android:textColor="@android:color/white"
         android:textSize="40sp"
         android:textStyle="bold" />
+
     <TextView
         android:id="@+id/appName2"
         android:layout_width="wrap_content"
@@ -50,9 +51,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textStyle="italic"
+        android:textStyle=""
         android:textSize="20sp"
-        android:textColor="#3490DC"
-        android:text="small sentences about app"/>
+        android:textColor="@color/gradient_end_color"
+        android:text="Good Health is the Happiness"/>
 
 </LinearLayout>

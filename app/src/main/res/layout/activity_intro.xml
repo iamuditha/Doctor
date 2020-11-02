@@ -65,10 +65,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="64dp"
-        android:elevation="100dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="60dp"
+
+        android:layout_marginBottom="65dp"
+        android:elevation="55dp"
         android:outlineProvider="bounds"
         android:text="@string/google_sign_up"
         app:isDarkTheme="true"
