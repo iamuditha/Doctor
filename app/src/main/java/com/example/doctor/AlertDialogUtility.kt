@@ -19,7 +19,7 @@ class AlertDialogUtility {
             layoutBuilder.et_name.visibility = View.INVISIBLE
 
             if (animNumber == 1) {
-                layoutBuilder.lottie_anim.setAnimation(R.raw.authentication_animation)   // json file in assets folder.
+                layoutBuilder.lottie_anim.setAnimation(R.raw.progress_animation)   // json file in assets folder.
                 // If json file in raw folder it will not work, file not found exception.
             } else if (animNumber == 2) {
                 layoutBuilder.lottie_anim.setAnimation(R.raw.authentication_animation)

@@ -9,11 +9,13 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.doctor.R
+import com.example.doctor.recordList.RecordModel
 
 
-class FullScreenRecordActivity : AppCompatActivity() {
+class FullScreenRecordActivity(data: ArrayList<RecordModel>) : AppCompatActivity() {
 
     var newList = ArrayList<Bitmap>()
+    var data = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

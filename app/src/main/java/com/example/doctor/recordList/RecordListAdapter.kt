@@ -45,9 +45,8 @@ class RecordListAdapter(private val arrayList: ArrayList<RecordModel>, private v
         holder.itemView.setOnClickListener {
             holder.itemView.setBackgroundColor(Color.parseColor("#b20000"))
             holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"))
-            val intent = Intent(
-                context,
-                FullScreenRecordActivity::class.java
+
+            val intent = Intent(context, FullScreenRecordActivity::class.java
             )
             intent.putExtra("position", position)
             Log.i("checking pos", position.toString())

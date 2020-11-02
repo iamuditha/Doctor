@@ -56,6 +56,8 @@ class DoctorRegisterActivity : AppCompatActivity() {
     private var list: List<String> = ArrayList()
     private val REQUEST_IMAGE_CAPTURE: Int = 100
 
+    val alertDialogUtility = AlertDialogUtility
+
 
 
     private val challengeResponse = ChallengeResponse("123456789")
@@ -71,6 +73,8 @@ class DoctorRegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_doctor_register)
         checkForGooglePermissions()
 
+
+        alertDialogUtility.alertDialog(this,"Searching for DID Document in the Phone",1)
 
 
         // Build a GoogleSignInClient with the options specified by gso.
