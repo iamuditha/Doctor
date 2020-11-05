@@ -9,6 +9,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.doctor.BaseActivity
 import com.example.doctor.R
 import com.example.doctor.recordList.RecordListActivity
 import com.example.doctor.utils.NoInternetDialogFragment
@@ -16,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_q_r.*
 import kotlinx.android.synthetic.main.activity_q_r.view.*
 
 
-class QRActivity : AppCompatActivity() {
+class QRActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

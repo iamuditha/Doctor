@@ -3,11 +3,12 @@ package com.example.doctor.recordList
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.doctor.BaseActivity
 import com.example.doctor.R
 import kotlinx.android.synthetic.main.activity_record_list.*
 import java.io.File
@@ -16,11 +17,14 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.reflect.typeOf
 
 
-class RecordListActivity : AppCompatActivity() {
+class RecordListActivity : BaseActivity() {
 
-    private val myCalendar: Calendar = Calendar.getInstance()
+    private val fromCalender: Calendar = Calendar.getInstance()
+    private val toCalendar: Calendar = Calendar.getInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -37,25 +41,45 @@ class RecordListActivity : AppCompatActivity() {
         autoComplete()
 
 
-        val date =
-            OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-                myCalendar.set(Calendar.YEAR, year)
-                myCalendar.set(Calendar.MONTH, monthOfYear)
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                updateLabel()
+        val fromDate =
+            OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                fromCalender.set(Calendar.YEAR, year)
+                fromCalender.set(Calendar.MONTH, monthOfYear)
+                fromCalender.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                updateLabel(from,fromCalender)
+            }
+
+        val toDate =
+            OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                toCalendar.set(Calendar.YEAR, year)
+                toCalendar.set(Calendar.MONTH, monthOfYear)
+                toCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                updateLabel(to,toCalendar)
             }
 
 
         from.setOnClickListener {
             DatePickerDialog(
                 this@RecordListActivity,
-                date,
-                myCalendar[Calendar.YEAR],
-                myCalendar[Calendar.MONTH],
-                myCalendar[Calendar.DAY_OF_MONTH]
+                fromDate,
+                fromCalender[Calendar.YEAR],
+                fromCalender[Calendar.MONTH],
+                fromCalender[Calendar.DAY_OF_MONTH]
+            ).show()
+        }
+        to.setOnClickListener {
+            DatePickerDialog(
+                this@RecordListActivity,
+                toDate,
+                toCalendar[Calendar.YEAR],
+                toCalendar[Calendar.MONTH],
+                toCalendar[Calendar.DAY_OF_MONTH]
             ).show()
         }
 
+        download.setOnClickListener {
+            Log.i("selections", convertDateToString(fromCalender))
+        }
 
 
 //        newArrayList = arrayList
@@ -119,10 +143,16 @@ class RecordListActivity : AppCompatActivity() {
         autoComplete.setAdapter(adapter)
     }
 
-    private fun updateLabel() {
+    private fun updateLabel(editText: EditText, calender : Calendar) {
         val myFormat = "MM/dd/yy" //In which you need put here
         val sdf = SimpleDateFormat(myFormat, Locale.US)
-        from.setText(sdf.format(myCalendar.getTime()))
+        editText.setText(sdf.format(calender.time))
+    }
+
+    private fun convertDateToString(calender : Calendar): String {
+        val myFormat = "MM/dd/yy" //In which you need put here
+        val sdf = SimpleDateFormat(myFormat, Locale.US)
+        return sdf.format(calender.time)
     }
 
 

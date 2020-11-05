@@ -9,10 +9,9 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.doctor.R
-import com.example.doctor.recordList.RecordModel
 
 
-class FullScreenRecordActivity(data: ArrayList<RecordModel>) : AppCompatActivity() {
+class FullScreenRecordActivity : AppCompatActivity() {
 
     var newList = ArrayList<Bitmap>()
     var data = null

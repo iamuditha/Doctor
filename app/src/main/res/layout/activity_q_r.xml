@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#FFFFFF"
+    android:background= "@drawable/background"
     tools:context=".qr.QRActivity">
 
     <TextView
@@ -53,15 +53,16 @@
         android:padding="2dp"
         android:layout_marginBottom="15dp"
         app:lottie_autoPlay="true"
+
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/qr_animation" />
 
     <Button
         android:id="@+id/hide"
-        android:layout_width="17dp"
-        android:layout_height="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/rounded_button_design_blue"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="Hide"
@@ -73,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/rounded_button_design_blue"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="View My QR Code"
@@ -89,7 +90,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="1dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/rounded_button_design_blue"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
         android:text="CONNECT WITH PATIENT"

@@ -5,13 +5,16 @@ package com.example.doctor
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
+import android.widget.Toolbar
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.loader.content.AsyncTaskLoader
+import androidx.drawerlayout.widget.DrawerLayout
 import com.example.doctor.challangeResponse.ChallengeResponse
 import com.example.doctor.qr.QRActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -27,6 +30,7 @@ import crypto.did.DID
 import crypto.did.DIDDocument
 import crypto.did.DIDDocumentGenerator
 import kotlinx.android.synthetic.main.activity_doctor_register.*
+import kotlinx.android.synthetic.main.toolbar.*
 import org.web3j.crypto.CipherException
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.WalletUtils
@@ -44,7 +48,7 @@ import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 
-class DoctorRegisterActivity : AppCompatActivity() {
+class DoctorRegisterActivity : BaseActivity() {
 
     private var RC_AUTHORIZE_DRIVE = 101
     private var ACCESS_DRIVE_SCOPE = Scope(Scopes.DRIVE_FILE)
@@ -68,20 +72,33 @@ class DoctorRegisterActivity : AppCompatActivity() {
         .requestEmail()
         .build()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doctor_register)
         checkForGooglePermissions()
 
+        val toolbar = (R.id.toolbar_main)
+        setSupportActionBar(toolbar_main)
 
-        alertDialogUtility.alertDialog(this,"Searching for DID Document in the Phone",1)
+
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
+
+
+        val actionBarDrawerToggle = ActionBarDrawerToggle(this,drawerLayout,toolbar_main,R.string.open,R.string.close)
+        drawerLayout.addDrawerListener(actionBarDrawerToggle)
+        actionBarDrawerToggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
+        alertDialogUtility.alertDialog(this, "Searching for DID Document in the Phone", 1)
 
 
         // Build a GoogleSignInClient with the options specified by gso.
         val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
         //randomly generated string for the DID
-        val myPublicKey =  UUID.randomUUID().toString().substring(0,8)
+        val myPublicKey =  UUID.randomUUID().toString().substring(0, 8)
 
         Log.i("did", filesDir.absolutePath)
 
@@ -345,7 +362,11 @@ class DoctorRegisterActivity : AppCompatActivity() {
     }
 
     private fun downloadFile(){
-        mDriveServiceHelper!!.downloadFile(File(Environment.getExternalStorageDirectory().toString()+"/uditha.crypt/"),"1pfaZSJDtex763-8vyTF-Z8uAl4dqAwMZ")
+        mDriveServiceHelper!!.downloadFile(
+            File(
+                Environment.getExternalStorageDirectory().toString() + "/uditha.crypt/"
+            ), "1pfaZSJDtex763-8vyTF-Z8uAl4dqAwMZ"
+        )
             ?.addOnSuccessListener { googleDriveFileHolder ->
                 val gson = Gson()
                 Log.i(

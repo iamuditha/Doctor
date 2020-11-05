@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".splashScreen.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,27 +22,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/newAppTheme"
             android:name=".DoctorRegisterActivity"
-            android:screenOrientation="sensorPortrait" />
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/newAppTheme" />
         <activity
-            android:theme="@style/newAppTheme"
             android:name=".fullScreenRecord.FullScreenRecordActivity"
-            android:screenOrientation="sensorPortrait" />
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/newAppTheme" />
         <activity
-            android:theme="@style/newAppTheme"
             android:name=".recordList.RecordListActivity"
-            android:screenOrientation="sensorPortrait" />
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/newAppTheme" />
         <activity
-            android:theme="@style/newAppTheme"
             android:name=".introScreen.IntroActivity"
-            android:screenOrientation="sensorPortrait">
-        </activity>
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/newAppTheme"></activity>
         <activity
             android:name=".qr.QRActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/newAppTheme">
-        </activity>
+            android:theme="@style/newAppTheme"></activity>
     </application>
 
 </manifest>
