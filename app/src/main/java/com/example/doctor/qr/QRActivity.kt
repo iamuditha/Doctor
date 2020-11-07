@@ -4,17 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import com.example.doctor.BaseActivity
 import com.example.doctor.R
 import com.example.doctor.recordList.RecordListActivity
 import com.example.doctor.utils.NoInternetDialogFragment
 import kotlinx.android.synthetic.main.activity_q_r.*
-import kotlinx.android.synthetic.main.activity_q_r.view.*
+import kotlinx.android.synthetic.main.toolbar.*
 
 
 class QRActivity : BaseActivity() {
@@ -23,6 +22,17 @@ class QRActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_q_r)
 
+        setSupportActionBar(toolbar_main)
+
+
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
+
+
+//        val actionBarDrawerToggle = ActionBarDrawerToggle(this,drawerLayout,toolbar_main,R.string.open,R.string.close)
+//        drawerLayout.addDrawerListener(actionBarDrawerToggle)
+//        actionBarDrawerToggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
         val did = intent.getStringExtra("did")
 
         val qrHolder = findViewById<ImageView>(R.id.qrholder)
@@ -60,6 +70,16 @@ class QRActivity : BaseActivity() {
 //                val intent = Intent(this, RecordListActivity::class.java)
 //                startActivity(intent)
 //            }, 200)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

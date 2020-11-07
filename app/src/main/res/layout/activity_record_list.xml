@@ -10,22 +10,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".recordList.RecordListActivity"
     android:background="@drawable/background"
     android:orientation="vertical">
 
+    <include
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corners_white"
+    android:foreground="@drawable/box"
+    android:orientation="horizontal"
+    android:layout_margin="25dp"
+    >
+
     <AutoCompleteTextView
         android:id="@+id/autoComplete"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="25dp"
-        android:hint="Search, eg. Test Name"
+        android:hint="Type the test name            "
         android:textColor="@android:color/darker_gray"
-        android:background="#F0F0F0"
-        android:foreground="@drawable/box"
-        android:drawableLeft="@drawable/test"
-        android:padding="10dp" />
+        android:backgroundTint="@color/Transparent"
+        android:padding="10dp"
+        android:layout_weight="1"/>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:background="@drawable/right_rounded_corners_blue"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/search"/>
+</LinearLayout>
 
     <LinearLayout
         android:layout_marginLeft="25dp"
@@ -38,13 +63,11 @@
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_corners"
+        android:background="@drawable/rounded_corners_white"
         android:foreground="@drawable/box"
         android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/calender"/>
+
+
         <EditText
             android:id="@+id/from"
             android:layout_width="wrap_content"
@@ -52,8 +75,20 @@
             android:clickable="true"
             android:focusable="false"
             android:hint="Start Date"
+            android:gravity="left"
             android:longClickable="false"
             android:padding="6dp" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:background="@drawable/right_rounded_corners_blue"
+            android:padding="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/calender"/>
     </LinearLayout>
 
         <TextView
@@ -68,13 +103,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/rounded_corners"
+            android:background="@drawable/rounded_corners_white"
             android:foreground="@drawable/box"
             android:orientation="horizontal">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/calender"/>
+
             <EditText
                 android:id="@+id/to"
                 android:layout_width="wrap_content"
@@ -84,6 +116,18 @@
                 android:hint="End Date"
                 android:longClickable="false"
                 android:padding="6dp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:background="@drawable/right_rounded_corners_blue"
+                android:padding="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/calender"/>
         </LinearLayout>
 
 
@@ -100,15 +144,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/qrAnimation"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="2dp"
-        android:layout_marginBottom="15dp"
-        app:lottie_autoPlay="false"
-        app:lottie_rawRes="@raw/downloaded_files" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleView"

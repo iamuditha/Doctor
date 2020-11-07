@@ -88,7 +88,7 @@ class DoctorRegisterActivity : BaseActivity() {
         val actionBarDrawerToggle = ActionBarDrawerToggle(this,drawerLayout,toolbar_main,R.string.open,R.string.close)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
         alertDialogUtility.alertDialog(this, "Searching for DID Document in the Phone", 1)

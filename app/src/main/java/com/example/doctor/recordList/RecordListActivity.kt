@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.doctor.BaseActivity
 import com.example.doctor.R
 import kotlinx.android.synthetic.main.activity_record_list.*
+import kotlinx.android.synthetic.main.toolbar.*
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -37,6 +39,10 @@ class RecordListActivity : BaseActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_record_list)
+
+        setSupportActionBar(toolbar_main)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
 
         autoComplete()
 
@@ -128,6 +134,16 @@ class RecordListActivity : BaseActivity() {
 //
         arrayList.addAll(dataList)
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun autoComplete() {

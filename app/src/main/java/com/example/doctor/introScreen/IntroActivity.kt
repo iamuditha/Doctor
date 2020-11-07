@@ -77,6 +77,7 @@ class IntroActivity : AppCompatActivity() {
     private fun signIn() {
         val signInIntent = mGoogleSignInClient!!.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
+        
     }
 
     override fun onStart() {
@@ -114,8 +115,8 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun getProfileData (account: GoogleSignInAccount) {
-//        Log.i("SignedIn", account.displayName||"no name")
-//        Log.i("SignedIn", account.email)
+        Log.i("SignedIn", account.displayName + account.familyName + account.givenName + account.photoUrl )
+        Log.i("SignedIn", account.email)
     }
 
 //    private fun checkForGooglePermissions() {

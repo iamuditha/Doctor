@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:orientation="vertical"
-    android:background="@android:color/holo_blue_light"
+    android:background="@color/colorPrimary"
     android:gravity="bottom"
     android:padding="20dp">
 
@@ -16,12 +16,14 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
         android:text="Travelling"
         android:textSize="24sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
         android:text="www.myemail.com"
         android:textSize="14sp"/>
 </LinearLayout>
