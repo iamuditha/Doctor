@@ -3,7 +3,7 @@ package com.example.doctor.challangeResponse
 enum class MessageType {
     CHALLENGE,
     RESPONSE,
-    SECRET_KEY,
+    DECRYPTION_KEY,
     TERMINATE,
     PING,
     VALIDATION,

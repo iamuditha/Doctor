@@ -1,9 +1,10 @@
 package com.example.doctor.challangeResponse
 
+import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 
-class MessageObject(private val type: MessageType, private val msg: String) : Serializable {
+class MessageObject(@SerializedName("type") private val type: MessageType, @SerializedName("msg") private val msg: String) : Serializable {
 
     fun getType(): MessageType {
         return type
