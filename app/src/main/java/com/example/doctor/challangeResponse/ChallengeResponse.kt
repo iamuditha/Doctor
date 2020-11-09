@@ -35,7 +35,7 @@ class ChallengeResponse(private val id: String) {
 
 
         val socket = IO.socket("https://f0f024a4e7dc.jp.ngrok.io", opts)
-        KeyHandler.getInstance().writePlainKeyPair(PublicPrivateKeyPairGenerator.getInstance().generateRSAKeyPair(),"./","./")
+//        KeyHandler.getInstance().writePlainKeyPair(PublicPrivateKeyPairGenerator.getInstance().generateRSAKeyPair(),"./","./")
 
 
         socket

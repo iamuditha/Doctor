@@ -36,6 +36,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
 import utilities.EthFunctions
 import java.io.*
+import java.lang.reflect.InvocationTargetException
 import java.nio.charset.StandardCharsets
 import java.security.InvalidAlgorithmParameterException
 import java.security.MessageDigest
@@ -80,9 +81,13 @@ class DoctorRegisterActivity : BaseActivity() {
         val toolbar = (R.id.toolbar_main)
         setSupportActionBar(toolbar_main)
 write.setOnClickListener {
-    val challengeResponse = ChallengeResponse("mydid")
+    try {
+        val challengeResponse = ChallengeResponse("mydid")
 
-    challengeResponse.challengeResponse()
+        challengeResponse.challengeResponse()
+    }catch (e: java.lang.reflect.InvocationTargetException){
+        Log.i("ooops",e.cause.toString())
+    }
 }
 
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
@@ -121,32 +126,32 @@ write.setOnClickListener {
 
 
         button.setOnClickListener {
-//            val intent = Intent(this, QRActivity::class.java)
-//            intent.putExtra("did", "this is a did")
-//            startActivity(intent)
+            val intent = Intent(this, QRActivity::class.java)
+            intent.putExtra("did", "this is a did")
+            startActivity(intent)
 
-            val thread = Thread{
-
-              try {
-                  val web3j: Web3j = Web3j.build(HttpService("https://c7fc09575149.ngrok.io"))
-
-                  val credentials = EthFunctions.createWallet("123", filesDir.absolutePath)
-
-                  val iamContractorHandler = IAMContractorHandler.getInstance()
-
-                  val iamContract = iamContractorHandler.getWrapperForContractor(web3j,getString(R.string.main_contractor_address),credentials)
-
-                  //get the blockchain registered email
-                  val blockchainEmail = iamContractorHandler.getDoctorEmail(iamContract,"mydid")
-
-                  Log.i("didm", blockchainEmail)
-              }catch (e : Exception){
-                  Log.i("didm", "error ${e.toString()}")
-
-              }
-            }
-
-            thread.start()
+//            val thread = Thread{
+//
+//              try {
+//                  val web3j: Web3j = Web3j.build(HttpService("https://c7fc09575149.ngrok.io"))
+//
+//                  val credentials = EthFunctions.createWallet("123", filesDir.absolutePath)
+//
+//                  val iamContractorHandler = IAMContractorHandler.getInstance()
+//
+//                  val iamContract = iamContractorHandler.getWrapperForContractor(web3j,getString(R.string.main_contractor_address),credentials)
+//
+//                  //get the blockchain registered email
+//                  val blockchainEmail = iamContractorHandler.getDoctorEmail(iamContract,"mydid")
+//
+//                  Log.i("didm", blockchainEmail)
+//              }catch (e : Exception){
+//                  Log.i("didm", "error ${e.toString()}")
+//
+//              }
+//            }
+//
+//            thread.start()
 
 //            downloadFile()
 //            getPermission()
