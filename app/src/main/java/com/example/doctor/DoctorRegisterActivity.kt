@@ -2,18 +2,15 @@ package com.example.doctor
 
 //import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256
 
+import ContractorHandlers.IAMContractorHandler
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
-import android.widget.Toolbar
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.doctor.challangeResponse.ChallengeResponse
 import com.example.doctor.qr.QRActivity
@@ -29,6 +26,7 @@ import com.google.gson.Gson
 import crypto.did.DID
 import crypto.did.DIDDocument
 import crypto.did.DIDDocumentGenerator
+import javaethereum.contracts.generated.IAMContract
 import kotlinx.android.synthetic.main.activity_doctor_register.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.web3j.crypto.CipherException
@@ -36,6 +34,7 @@ import org.web3j.crypto.Credentials
 import org.web3j.crypto.WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
+import utilities.EthFunctions
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.security.InvalidAlgorithmParameterException
@@ -64,13 +63,13 @@ class DoctorRegisterActivity : BaseActivity() {
 
 
 
-    private val challengeResponse = ChallengeResponse("123456789")
 
 
     //configure the google sign in
     var gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
         .build()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,18 +79,36 @@ class DoctorRegisterActivity : BaseActivity() {
 
         val toolbar = (R.id.toolbar_main)
         setSupportActionBar(toolbar_main)
+write.setOnClickListener {
+    val challengeResponse = ChallengeResponse("mydid")
 
+    challengeResponse.challengeResponse()
+}
 
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
 
 
-        val actionBarDrawerToggle = ActionBarDrawerToggle(this,drawerLayout,toolbar_main,R.string.open,R.string.close)
+        val actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            toolbar_main,
+            R.string.open,
+            R.string.close
+        )
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
         alertDialogUtility.alertDialog(this, "Searching for DID Document in the Phone", 1)
+
+        var prefs: SharedPreferences = getSharedPreferences("PROFILE_DATA", MODE_PRIVATE)
+        var name: String? = prefs.getString("name", "No name defined")
+        var email: String? = prefs.getString("email", "no email")
+        var url: String? = prefs.getString("url", "no email")
+
+
+        Log.i("sharedData", "$name $email $url")
+
 
 
         // Build a GoogleSignInClient with the options specified by gso.
@@ -102,17 +119,37 @@ class DoctorRegisterActivity : BaseActivity() {
 
         Log.i("did", filesDir.absolutePath)
 
-        val web3j: Web3j = Web3j.build(HttpService("https://7548760fd8e9.jp.ngrok.io"))
-
 
         button.setOnClickListener {
-            val intent = Intent(this, QRActivity::class.java)
-            intent.putExtra("did", "this is a did")
-            startActivity(intent)
+//            val intent = Intent(this, QRActivity::class.java)
+//            intent.putExtra("did", "this is a did")
+//            startActivity(intent)
+
+            val thread = Thread{
+
+              try {
+                  val web3j: Web3j = Web3j.build(HttpService("https://c7fc09575149.ngrok.io"))
+
+                  val credentials = EthFunctions.createWallet("123", filesDir.absolutePath)
+
+                  val iamContractorHandler = IAMContractorHandler.getInstance()
+
+                  val iamContract = iamContractorHandler.getWrapperForContractor(web3j,getString(R.string.main_contractor_address),credentials)
+
+                  //get the blockchain registered email
+                  val blockchainEmail = iamContractorHandler.getDoctorEmail(iamContract,"mydid")
+
+                  Log.i("didm", blockchainEmail)
+              }catch (e : Exception){
+                  Log.i("didm", "error ${e.toString()}")
+
+              }
+            }
+
+            thread.start()
 
 //            downloadFile()
 //            getPermission()
-
 
 //            getURL(googleDriveService.files()[])
 

@@ -20,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.math.floor
 
 
-class ChallengeResponse(private val did: String) {
+class ChallengeResponse(private val id: String) {
 
     private var isValidated: Boolean = false
     private lateinit var secretKey: Key;
@@ -31,10 +31,10 @@ class ChallengeResponse(private val did: String) {
     fun challengeResponse() {
 
         val opts = IO.Options()
-        opts.query = "type=doctor&&id=${did}"
+        opts.query = "type=doctor&&id=${id}"
 
 
-        val socket = IO.socket("https://fe071c124e4b.ngrok.io", opts)
+        val socket = IO.socket("https://f0f024a4e7dc.jp.ngrok.io", opts)
         KeyHandler.getInstance().writePlainKeyPair(PublicPrivateKeyPairGenerator.getInstance().generateRSAKeyPair(),"./","./")
 
 
@@ -125,7 +125,7 @@ class ChallengeResponse(private val did: String) {
         isValidated = false
         socket.emit(
             "sendTo", createMessage(
-                did,
+                id,
                 MessageSerializerHandler.instance?.serialize(
                     MessageObject(
                         MessageType.TERMINATE,
@@ -141,7 +141,7 @@ class ChallengeResponse(private val did: String) {
         Handler(Looper.getMainLooper()).postDelayed({
             socket.emit(
                 "sendTo", createMessage(
-                    did,
+                    id,
                     MessageSerializerHandler.instance?.serialize(
                         MessageObject(
                             MessageType.PING,

@@ -1,19 +1,14 @@
 package com.example.doctor.introScreen
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.doctor.DoctorRegisterActivity
-import com.example.doctor.qr.QRActivity
 import com.example.doctor.R
-import com.example.doctor.recordList.RecordListActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -24,7 +19,7 @@ import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_intro.*
-import java.io.File
+
 
 class IntroActivity : AppCompatActivity() {
 
@@ -41,7 +36,10 @@ class IntroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_intro)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
 
 
         // get intro screen tab layout data
@@ -105,6 +103,9 @@ class IntroActivity : AppCompatActivity() {
         try {
             val account = completedTask.getResult(ApiException::class.java)
             account?.let { getProfileData(it) }
+            if (account != null) {
+                getProfileData(account)
+            }
             // Signed in successfully, show authenticated UI.
             val intent = Intent(this, DoctorRegisterActivity::class.java) /*******************************************************************/
             startActivity(intent)
@@ -114,9 +115,16 @@ class IntroActivity : AppCompatActivity() {
         }
     }
 
-    private fun getProfileData (account: GoogleSignInAccount) {
-        Log.i("SignedIn", account.displayName + account.familyName + account.givenName + account.photoUrl )
-        Log.i("SignedIn", account.email)
+    private fun getProfileData(account: GoogleSignInAccount) {
+        sharedPreference(account)
+    }
+
+    private fun sharedPreference(account: GoogleSignInAccount){
+        val editor = getSharedPreferences("PROFILE_DATA", MODE_PRIVATE).edit()
+        editor.putString("email", account.email)
+        editor.putString("name", account.displayName)
+        editor.putString("url", account.photoUrl.toString())
+        editor.apply()
     }
 
 //    private fun checkForGooglePermissions() {
