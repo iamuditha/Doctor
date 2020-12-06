@@ -4,7 +4,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/recordList"
-            android:title="Record List"
+            android:title="LogOut"
             android:icon="@mipmap/ic_launcher_round"/>
 
     </group>

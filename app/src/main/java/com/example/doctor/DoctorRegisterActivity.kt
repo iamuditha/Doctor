@@ -2,22 +2,33 @@ package com.example.doctor
 
 //import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256
 
-import ContractorHandlers.IAMContractorHandler
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
+import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.doctor.challangeResponse.ChallengeResponse
 import com.example.doctor.qr.QRActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.Scope
+import com.google.android.material.navigation.NavigationView
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.json.gson.GsonFactory
@@ -26,17 +37,13 @@ import com.google.gson.Gson
 import crypto.did.DID
 import crypto.did.DIDDocument
 import crypto.did.DIDDocumentGenerator
-import javaethereum.contracts.generated.IAMContract
 import kotlinx.android.synthetic.main.activity_doctor_register.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.web3j.crypto.CipherException
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.WalletUtils
-import org.web3j.protocol.Web3j
-import org.web3j.protocol.http.HttpService
-import utilities.EthFunctions
 import java.io.*
-import java.lang.reflect.InvocationTargetException
+import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.security.InvalidAlgorithmParameterException
 import java.security.MessageDigest
@@ -48,7 +55,7 @@ import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 
-class DoctorRegisterActivity : BaseActivity() {
+class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener {
 
     private var RC_AUTHORIZE_DRIVE = 101
     private var ACCESS_DRIVE_SCOPE = Scope(Scopes.DRIVE_FILE)
@@ -63,32 +70,46 @@ class DoctorRegisterActivity : BaseActivity() {
     val alertDialogUtility = AlertDialogUtility
 
 
-
-
-
     //configure the google sign in
     var gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
         .build()
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doctor_register)
         checkForGooglePermissions()
 
         val toolbar = (R.id.toolbar_main)
         setSupportActionBar(toolbar_main)
-write.setOnClickListener {
-    try {
-        val challengeResponse = ChallengeResponse("mydid")
 
-        challengeResponse.challengeResponse()
-    }catch (e: java.lang.reflect.InvocationTargetException){
-        Log.i("ooops",e.cause.toString())
-    }
-}
+        isDIDDocumentInThePhone()
+
+        getPermission()
+
+        val thread = Thread{
+            val link = "https://drive.google.com/uc?id=1yDrgiZJhprsqGwYEfa4WPzHBYzdxBoIO&export=download"
+            val newLink = "https://drive.google.com/uc?export=download&id=1KsKJ6z1OVckcGX_FRb8epgKPUOYumdYM"
+            newLink.saveTo(Environment.getExternalStorageDirectory().absolutePath + "/anehariyamnujjjjo.txt")
+//            uploadFileToDrive()
+                listFilesInDrive()
+        }
+        thread.start()
+        choose.setOnClickListener {
+            filePicker()
+        }
+
+        write.setOnClickListener {
+            try {
+                val challengeResponse = ChallengeResponse("mydid")
+
+                challengeResponse.challengeResponse()
+            } catch (e: Exception) {
+                Log.i("ooops", e.toString())
+            }
+        }
 
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
 
@@ -109,18 +130,29 @@ write.setOnClickListener {
         var prefs: SharedPreferences = getSharedPreferences("PROFILE_DATA", MODE_PRIVATE)
         var name: String? = prefs.getString("name", "No name defined")
         var email: String? = prefs.getString("email", "no email")
-        var url: String? = prefs.getString("url", "no email")
+        var url: String? = prefs.getString("url", "no url")
+
+        val navigationView: NavigationView = findViewById<View>(R.id.nav_view) as NavigationView
+        val headerView: View = navigationView.getHeaderView(0)
+        val navUsername = headerView.findViewById(R.id.doctorName) as TextView
+        val navUseremail = headerView.findViewById(R.id.doctorEmail) as TextView
+        val navUserImage = headerView.findViewById(R.id.doctorImage) as ImageView
+
+
+        navUsername.text = name
+        navUseremail.text = email
+        Glide.with(this).load(url).apply(RequestOptions.circleCropTransform()).into(navUserImage)
+
 
 
         Log.i("sharedData", "$name $email $url")
-
 
 
         // Build a GoogleSignInClient with the options specified by gso.
         val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
         //randomly generated string for the DID
-        val myPublicKey =  UUID.randomUUID().toString().substring(0, 8)
+        val myPublicKey = UUID.randomUUID().toString().substring(0, 8)
 
         Log.i("did", filesDir.absolutePath)
 
@@ -218,11 +250,48 @@ write.setOnClickListener {
         }
 
 
+
+
         //upload did to drive
 
         //get the hash
 
         //upload the link to the block chain
+    }
+    private fun filePicker() {
+        var chooseFile = Intent(Intent.ACTION_GET_CONTENT)
+        chooseFile.type = "*/*"
+        chooseFile = Intent.createChooser(chooseFile, "Choose a file")
+        startActivityForResult(chooseFile, 999)
+    }
+
+    @Throws(IOException::class)
+    private fun copy(source: File, destination: File) {
+        val `in`: FileChannel? = FileInputStream(source).channel
+        val out: FileChannel? = FileOutputStream(destination).channel
+        try {
+            `in`?.transferTo(0, `in`.size(), out)
+        } catch (e: java.lang.Exception) {
+            Log.d("Exception", e.toString())
+        } finally {
+            `in`?.close()
+            out?.close()
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 999 && resultCode == Activity.RESULT_OK && data!= null){
+            val destination =  File(Environment.getExternalStorageDirectory().absolutePath + "/filenamehjkl.txt");
+            val newDestination = File(applicationContext.filesDir.absolutePath +"/didDocument.txt")
+
+            val `in` = contentResolver.openInputStream(data.data!!)
+            if (`in` != null) {
+                copyInputStreamToFile(`in`,newDestination)
+            }
+
+        }
     }
 
     //convert the did document in to JSON format
@@ -241,7 +310,7 @@ write.setOnClickListener {
             return did
 
         } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
+//            e.printStackTrace()
             Log.i("did", "error..............")
             return e.message
         }
@@ -255,7 +324,7 @@ write.setOnClickListener {
             convertToJSON(didDocument)
 
         } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
+//            e.printStackTrace()
             Log.i("did", "error.............. ${e.message}")
             e.message!!
         }
@@ -303,7 +372,7 @@ write.setOnClickListener {
 
     //check whether the previously created DID document is in the mobile device
     private fun isDIDDocumentInThePhone(): Boolean {
-        val file = File(applicationContext.filesDir, "didDocument.json")
+        val file = File(applicationContext.filesDir, "didDocument.txt")
         Log.e("did", "Is there a DID document in the mobile: ${file.exists()}")
         return file.exists()
     }
@@ -316,7 +385,7 @@ write.setOnClickListener {
         for (i in bytes.indices) {
             sb.append((bytes[i].toInt() and 0xff) + 0x100).substring(1)
         }
-        Log.i("did", "hash is : ${sb.toString()}")
+        Log.i("did", "hash is : $sb")
         return sb.toString()
     }
 
@@ -330,15 +399,15 @@ write.setOnClickListener {
     )
     fun createWallet(walletPassword: String?, walletDirectory: String): Credentials? {
         val walletName = WalletUtils.generateBip39Wallet(walletPassword, File(walletDirectory))
-        println("wallet location: $walletDirectory/$walletName")
+//        println("wallet location: $walletDirectory/$walletName")
         val credentials =
             WalletUtils.loadCredentials(walletPassword, "$walletDirectory/${walletName.filename}")
         val privateKey = credentials.ecKeyPair.privateKey.toString(16)
         val publicKey = credentials.ecKeyPair.publicKey.toString(16)
         val walletAddress = credentials.address
-        println("privateKey:$privateKey")
-        println("publicKey:$publicKey")
-        println("Wallet Address: $walletAddress")
+//        println("privateKey:$privateKey")
+//        println("publicKey:$publicKey")
+//        println("Wallet Address: $walletAddress")
         return credentials
     }
 
@@ -403,7 +472,7 @@ write.setOnClickListener {
             }
     }
 
-    private fun downloadFile(){
+    private fun downloadFile() {
         mDriveServiceHelper!!.downloadFile(
             File(
                 Environment.getExternalStorageDirectory().toString() + "/uditha.crypt/"
@@ -435,8 +504,8 @@ write.setOnClickListener {
                 }
                 var fileList = mDriveServiceHelper?.listDriveImageFiles()
                 Log.i("logininfo", fileList!!.size.toString())
-                Log.i("logininfo", fileList!![0].toString())
-                Log.i("logininfo", fileList!![1].toString())
+                Log.i("logininfo", fileList[0].toString())
+                Log.i("logininfo", fileList[1].toString())
 
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -449,19 +518,19 @@ write.setOnClickListener {
 
     //upload a file to the drive
     private fun uploadFileToDrive() {
-        val file = File(applicationContext.filesDir, "didDocument.json")
+        val file = File(applicationContext.filesDir, "didDocument.txt")
         mDriveServiceHelper!!.uploadFile(file, "application/json", null)
             ?.addOnSuccessListener { googleDriveFileHolder ->
                 val gson = Gson()
                 Log.i(
                     "logininfo",
-                    "on success File download" + gson.toJson(googleDriveFileHolder)
+                    "on success File upload" + gson.toJson(googleDriveFileHolder)
                 )
             }
             ?.addOnFailureListener { e ->
                 Log.i(
                     "logininfo",
-                    "on failure of file download" + e.message
+                    "on failure of file upload" + e.message
                 )
             }
     }
@@ -507,7 +576,45 @@ write.setOnClickListener {
 //            }
 
 
+        }
+    }
 
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        Log.i("drawerfunctions", "asdfghj")
+        when (item!!.itemId) {
+            R.id.recordList -> {
+                Toast.makeText(this, "Logout Successfully", Toast.LENGTH_SHORT).show()
+                Log.i("drawerfunctions", "I am clicked")
+                return true
+            }
+
+        }
+        return true
+    }
+
+
+    private fun copyInputStreamToFile(`in`: InputStream, file: File) {
+        var out: OutputStream? = null
+        try {
+            out = FileOutputStream(file)
+            val buf = ByteArray(1024)
+            var len: Int
+            while (`in`.read(buf).also { len = it } > 0) {
+                out.write(buf, 0, len)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        } finally {
+            // Ensure that the InputStreams are closed even if there's an exception.
+            try {
+                out?.close()
+
+                // If you want to close the "in" InputStream yourself then remove this
+                // from here but ensure that you close it yourself eventually.
+                `in`.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
     }
 }
