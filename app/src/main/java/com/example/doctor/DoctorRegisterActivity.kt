@@ -1,17 +1,12 @@
 package com.example.doctor
 
-//import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256
-
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -23,6 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.doctor.challangeResponse.ChallengeResponse
+import com.example.doctor.challangeResponse.challangeResponseService
 import com.example.doctor.qr.QRActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -82,23 +78,17 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
         setContentView(R.layout.activity_doctor_register)
         checkForGooglePermissions()
 
-        val toolbar = (R.id.toolbar_main)
+        (R.id.toolbar_main)
         setSupportActionBar(toolbar_main)
 
         isDIDDocumentInThePhone()
 
         getPermission()
 
-        val thread = Thread{
-            val link = "https://drive.google.com/uc?id=1yDrgiZJhprsqGwYEfa4WPzHBYzdxBoIO&export=download"
-            val newLink = "https://drive.google.com/uc?export=download&id=1KsKJ6z1OVckcGX_FRb8epgKPUOYumdYM"
-            newLink.saveTo(Environment.getExternalStorageDirectory().absolutePath + "/anehariyamnujjjjo.txt")
-//            uploadFileToDrive()
-                listFilesInDrive()
-        }
-        thread.start()
         choose.setOnClickListener {
             filePicker()
+            alertDialogUtility.alertDialog(this, "Uploading....", 1)
+
         }
 
         write.setOnClickListener {
@@ -125,7 +115,7 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
         actionBarDrawerToggle.syncState()
         supportActionBar?.setHomeButtonEnabled(true)
 
-        alertDialogUtility.alertDialog(this, "Searching for DID Document in the Phone", 1)
+//        alertDialogUtility.alertDialog(this, "Uploading....", 1)
 
         var prefs: SharedPreferences = getSharedPreferences("PROFILE_DATA", MODE_PRIVATE)
         var name: String? = prefs.getString("name", "No name defined")
@@ -146,6 +136,11 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
 
 
         Log.i("sharedData", "$name $email $url")
+
+        write.setOnClickListener{
+            val intent1 = Intent(baseContext, challangeResponseService::class.java)
+            startService(intent1)
+        }
 
 
         // Build a GoogleSignInClient with the options specified by gso.
@@ -247,6 +242,8 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
 //                intent.putExtra("did", "123456789")
 //                startActivity(intent)
 //            }
+
+
         }
 
 
@@ -284,11 +281,11 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 999 && resultCode == Activity.RESULT_OK && data!= null){
             val destination =  File(Environment.getExternalStorageDirectory().absolutePath + "/filenamehjkl.txt");
-            val newDestination = File(applicationContext.filesDir.absolutePath +"/didDocument.txt")
+            val newDestination = File(applicationContext.filesDir.absolutePath + "/didDocument.txt")
 
             val `in` = contentResolver.openInputStream(data.data!!)
             if (`in` != null) {
-                copyInputStreamToFile(`in`,newDestination)
+                copyInputStreamToFile(`in`, newDestination)
             }
 
         }
@@ -420,7 +417,6 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
                 SCOPE_APP_DATA
             )
         ) {
-            Log.i("logininfo", "oooooooooooooooooooooooooooooooooooops")
             GoogleSignIn.requestPermissions(
                 this@DoctorRegisterActivity,
                 RC_AUTHORIZE_DRIVE,
@@ -583,7 +579,7 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
         Log.i("drawerfunctions", "asdfghj")
         when (item!!.itemId) {
             R.id.recordList -> {
-                Toast.makeText(this, "Logout Successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Logout Successfully hahaha", Toast.LENGTH_SHORT).show()
                 Log.i("drawerfunctions", "I am clicked")
                 return true
             }

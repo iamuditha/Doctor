@@ -13,10 +13,10 @@ class AlertDialogUtility {
     companion object {
         fun alertDialog(context: Context, alertText: String, animNumber: Int) {
             val layoutBuilder = LayoutInflater.from(context).inflate(R.layout.alert_resource_layout, null)
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context).setView(layoutBuilder)
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context).setView(layoutBuilder).setCancelable(false)
             val alertDialog:AlertDialog = builder.show()
             layoutBuilder.tv_alert.text = alertText
-            layoutBuilder.et_name.visibility = View.INVISIBLE
+//            layoutBuilder.et_name.visibility = View.INVISIBLE
 
             if (animNumber == 1) {
                 layoutBuilder.lottie_anim.setAnimation(R.raw.progress_animation)   // json file in assets folder.
@@ -29,10 +29,10 @@ class AlertDialogUtility {
 
             layoutBuilder.lottie_anim.loop(true)
             layoutBuilder.lottie_anim.playAnimation()
-            layoutBuilder.btn_ok.setOnClickListener {
-                Toast.makeText(context, "Ok Bye "/* + layoutBuilder.et_name.text.toString()*/, Toast.LENGTH_SHORT).show()
-                alertDialog.dismiss()
-            }
+//            layoutBuilder.btn_ok.setOnClickListener {
+//                Toast.makeText(context, "Ok Bye "/* + layoutBuilder.et_name.text.toString()*/, Toast.LENGTH_SHORT).show()
+//                alertDialog.dismiss()
+//            }
         }
     }
 }

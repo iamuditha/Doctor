@@ -76,7 +76,7 @@ dependencies {
 
     implementation group: 'org.web3j', name: 'core', version: '4.1.0-android'
 
-    implementation group: 'com.github.nkzawa', name: 'socket.io-client', version: '0.6.0'
+//    implementation group: 'com.github.nkzawa', name: 'socket.io-client', version: '0.6.0'
 
     // for drive integration
     implementation 'com.google.http-client:google-http-client-gson:1.26.0'
@@ -94,5 +94,6 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation group: 'io.socket', name: 'socket.io-client', version: '1.0.0'
 
 }

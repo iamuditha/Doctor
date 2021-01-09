@@ -37,11 +37,16 @@
         <activity
             android:name=".introScreen.IntroActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/newAppTheme"></activity>
+            android:theme="@style/newAppTheme" />
         <activity
             android:name=".qr.QRActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/newAppTheme"></activity>
+            android:theme="@style/newAppTheme" />
+
+        <service
+            android:name=".challangeResponse.challangeResponseService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>
