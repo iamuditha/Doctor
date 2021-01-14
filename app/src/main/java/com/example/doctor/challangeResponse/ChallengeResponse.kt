@@ -9,7 +9,6 @@ import android.util.Log
 import crypto.AsymmetricEncDec
 import crypto.KeyHandler
 import crypto.PublicPrivateKeyPairGenerator
-import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
 
@@ -79,19 +78,13 @@ class ChallengeResponse(private val id: String) {
             val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(
                 MessageObject(MessageType.PING,"success")
             )
-            socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) },Ack{ param ->
-                val responseData = param[0]
-                Log.i("myservice","abc$responseData")
-            })
+            socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) })
         } else {
             isValidated = false
             val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(
                 MessageObject(MessageType.PING,"fail")
             )
-            socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) }, Ack{ param ->
-                val responseData = param[0]
-                Log.i("myservice","abc$responseData")
-            })
+            socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) })
         }
     }
 
@@ -119,10 +112,7 @@ class ChallengeResponse(private val id: String) {
 //        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
 //        var encryptedString: String= String(cipher.doFinal(serializeMsg?.toByteArray()), StandardCharsets.UTF_8)
 //
-        socket.emit("sendTo", createMessage(id, serializeMsg!!),Ack{ param ->
-            val responseData = param[0]
-            Log.i("myservice","abc$responseData")
-        })
+        socket.emit("sendTo", createMessage(id, serializeMsg!!))
     }
 
     private fun decryptionKeyHandler(socket: Socket, decryptionKey: String, id: String) {
@@ -135,10 +125,7 @@ class ChallengeResponse(private val id: String) {
             MessageObject(
                 MessageType.PING, "success")
         )
-        socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) },Ack{ param ->
-            val responseData = param[0]
-            Log.i("service","abc$responseData")
-        })
+        socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) })
 
 //        }else {
 //            val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(MessageObject(MessageType.PING, "fail"))
@@ -157,10 +144,7 @@ class ChallengeResponse(private val id: String) {
                         "terminate"
                     )
                 )!!
-            ),Ack{ param ->
-                val responseData = param[0]
-                Log.i("service","abc$responseData")
-            }
+            )
         )
         socket.disconnect()
     }
@@ -176,10 +160,7 @@ class ChallengeResponse(private val id: String) {
                             "ping"
                         )
                     )!!
-                ),Ack{ param ->
-                    val responseData = param[0]
-                    Log.i("myservice","abc$responseData")
-                }
+                )
             )
         }, 10*1000)
     }
