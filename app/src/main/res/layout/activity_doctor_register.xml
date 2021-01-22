@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".DoctorRegisterActivity"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"
     >
     <include
         layout="@layout/toolbar"
@@ -24,52 +23,224 @@
         app:menu="@menu/drawer_menu"
         />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
 
-        <Button
-            android:id="@+id/choose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="36dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:text="Choose"
-            android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.138"
-            app:layout_constraintStart_toStartOf="parent" />
+<!--        <TextView-->
+<!--            android:id="@+id/statusmy"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="connection"-->
+<!--            android:textSize="30sp"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/button"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="36dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:text="Button"
-            android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/write"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="36dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:text="Write"
-            android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/button" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+<!--        <Button-->
+<!--            android:id="@+id/choose"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginEnd="10dp"-->
+<!--            android:layout_marginBottom="36dp"-->
+<!--            android:backgroundTint="@color/colorPrimaryDark"-->
+<!--            android:text="Choose"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.138"-->
+<!--            app:layout_constraintStart_toStartOf="parent" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/button"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginEnd="10dp"-->
+<!--            android:layout_marginBottom="36dp"-->
+<!--            android:backgroundTint="@color/colorPrimaryDark"-->
+<!--            android:text="Button"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.498"-->
+<!--            app:layout_constraintStart_toStartOf="parent" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/write"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginEnd="10dp"-->
+<!--            android:layout_marginBottom="36dp"-->
+<!--            android:backgroundTint="@color/colorPrimaryDark"-->
+<!--            android:text="Write"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/button" />-->
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="?android:actionBarSize">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.66">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="25dp"
+                            android:background="#043BB1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:fontFamily="serif"
+                                android:gravity="center"
+                                android:text="WELCOME !!!"
+                                android:textColor="@android:color/white"
+                                android:textSize="30sp"
+                                android:textStyle="bold" />
+
+
+                            <com.airbnb.lottie.LottieAnimationView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_gravity="center"
+                                android:layout_weight="0.4"
+                                app:lottie_autoPlay="true"
+                                app:lottie_loop="true"
+                                app:lottie_rawRes="@raw/search" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="Please Upload DID to Verify your Identity"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="50dp"
+                                android:gravity="center"
+                                android:text="Press the Below Button to Start Search"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp" />
+
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/searchDid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:background="@drawable/orange_button_background"
+                            android:drawableStart="@drawable/search"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:text="  SEARCH MY DID"
+                            android:textColor="@android:color/white"
+                            android:textStyle="bold" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.34"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/or"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:text="---------- or ----------"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/uploadDid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:background="@drawable/orange_button_background"
+                        android:drawableStart="@drawable/upload"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="  UPLOAD MY DID"
+                        android:elevation="30dp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:maxLines="1"
+                        android:padding="8dp"
+                        android:text="If this is your first time, Please Register from here"
+                        android:textColor="#043BB1"
+                        android:textCursorDrawable="@drawable/cursor" />
+
+                    <Button
+                        android:id="@+id/register"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:background="@drawable/blue_button_background"
+                        android:drawableStart="@drawable/register"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:elevation="30dp"
+                        android:text="  Register"
+                        android:layout_marginBottom="8dp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+<!--        <com.google.android.material.navigation.NavigationView-->
+<!--            android:id="@+id/nav_view"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_gravity="start"-->
+<!--            app:headerLayout="@layout/header"-->
+<!--            app:menu="@menu/drawer_menu" />-->
+
+
 </androidx.drawerlayout.widget.DrawerLayout>
 

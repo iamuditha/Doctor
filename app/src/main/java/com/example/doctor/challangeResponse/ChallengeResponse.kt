@@ -3,27 +3,24 @@ package com.example.doctor.challangeResponse
 import ChallengeResponse.MessageObject
 import ChallengeResponse.MessageSerializerHandler
 import ChallengeResponse.MessageType
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.doctor.objects.Status
 import crypto.AsymmetricEncDec
 import crypto.KeyHandler
-import crypto.PublicPrivateKeyPairGenerator
 import io.socket.client.IO
 import io.socket.client.Socket
-
 import org.json.JSONException
 import org.json.JSONObject
-import java.nio.charset.StandardCharsets
-import java.security.Key
 import java.security.PrivateKey
 import java.util.*
 import javax.crypto.Cipher
-import javax.crypto.spec.SecretKeySpec
 import kotlin.math.floor
 
 
-class ChallengeResponse(private val id: String) {
+class ChallengeResponse(private val id: String, private val context: Context) {
 
     private var isValidated: Boolean = false
     //    private  var secretKey: Key? = null;
@@ -37,22 +34,27 @@ class ChallengeResponse(private val id: String) {
         opts.query = "type=doctor&&id=${id}"
 
 
-        val socket = IO.socket("https://58585021af19.ngrok.io", opts)
+        val socket = IO.socket("https://e50cb81146d3.ngrok.io", opts)
 //        KeyHandler.getInstance().writePlainKeyPair(PublicPrivateKeyPairGenerator.getInstance().generateRSAKeyPair(),"./","./")
 
 
         socket
             .on(Socket.EVENT_CONNECT) {
-                Log.i("challengeResponse", "onConnect");
+                Status.setTime(Calendar.getInstance().time)
+                Status.connect()
+
+
 
             }.on("fromServer") { parameters ->
                 val myJSON = parameters[0] as JSONObject
                 val id = myJSON.get("id")
                 val msg : String  = myJSON.get("msg") as String
                 val challengeCipherc: String = myJSON.get("msg") as String
-                Log.i("challangeresponsemsg",challengeCipherc)
+                Log.i("challangeresponsemsg", challengeCipherc)
 
-                val messageObject = MessageSerializerHandler.getInstance()?.deserialize(challengeCipherc) as MessageObject
+                val messageObject = MessageSerializerHandler.getInstance()?.deserialize(
+                    challengeCipherc
+                ) as MessageObject
 
 
                 when (messageObject.messageType) {
@@ -62,27 +64,40 @@ class ChallengeResponse(private val id: String) {
                         messageObject.msg
                     )
                     MessageType.RESPONSE -> Log.i("message", "Invalid...........")
-                    MessageType.DECRYPTION_KEY -> decryptionKeyHandler(socket, messageObject.msg, id as String);
+                    MessageType.DECRYPTION_KEY -> decryptionKeyHandler(
+                        socket,
+                        messageObject.msg,
+                        id as String
+                    );
                     MessageType.TERMINATE -> mTerminate(socket)
                     MessageType.PING -> ping(id as String, socket)
-                    MessageType.VALIDATION -> validationHandler(socket, id as String, messageObject.msg)
+                    MessageType.VALIDATION -> validationHandler(
+                        socket,
+                        id as String,
+                        messageObject.msg
+                    )
                 }
             }
-        socket.on(Socket.EVENT_DISCONNECT) { Log.i("msg", "asdfghjhgfds") }
+        socket.on(Socket.EVENT_DISCONNECT) {
+            Status.isDisconnected = false
+            Log.i("msg", "asdfghjhgfds") }
         socket.connect()
     }
 
     private fun validationHandler(socket: Socket, id: String, message: String) {
         if(message.equals("True"))  {
+//            Timer.check()
+
+            Log.i("secondsRemaining", "i am called")
             isValidated = true;
             val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(
-                MessageObject(MessageType.PING,"success")
+                MessageObject(MessageType.PING, "success")
             )
             socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) })
         } else {
             isValidated = false
             val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(
-                MessageObject(MessageType.PING,"fail")
+                MessageObject(MessageType.PING, "fail")
             )
             socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) })
         }
@@ -101,11 +116,14 @@ class ChallengeResponse(private val id: String) {
     }
 
     private fun challengeHandler(socket: Socket, id: String, challenge: String) {
-        var privateKey: PrivateKey = KeyHandler.getInstance().loadRSAPrivateFromPlainText(privateKeyStrings);
+        var privateKey: PrivateKey = KeyHandler.getInstance().loadRSAPrivateFromPlainText(
+            privateKeyStrings
+        );
         val msgObjString = AsymmetricEncDec.getInstance().decryptString(challenge, privateKey)
         val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(
             MessageObject(
-                MessageType.RESPONSE, msgObjString)
+                MessageType.RESPONSE, msgObjString
+            )
         )
 
 
@@ -116,14 +134,19 @@ class ChallengeResponse(private val id: String) {
     }
 
     private fun decryptionKeyHandler(socket: Socket, decryptionKey: String, id: String) {
-        var privateKey: PrivateKey = KeyHandler.getInstance().loadRSAPrivateFromPlainText(privateKeyStrings);
+
+        Log.i("secondsRemaining", "i am called")
+        var privateKey: PrivateKey = KeyHandler.getInstance().loadRSAPrivateFromPlainText(
+            privateKeyStrings
+        );
         val msgObjString = AsymmetricEncDec.getInstance().decryptString(decryptionKey, privateKey)
 //        if(isValidated) {
         this.decryptionKey = msgObjString;
-        Log.i("challangeresponse1",this.decryptionKey)
+        Log.i("challangeresponse1", this.decryptionKey)
         val serializeMsg: String? = MessageSerializerHandler.getInstance()?.serialize(
             MessageObject(
-                MessageType.PING, "success")
+                MessageType.PING, "success"
+            )
         )
         socket.emit("sendTo", serializeMsg?.let { createMessage(id, it) })
 
@@ -134,6 +157,8 @@ class ChallengeResponse(private val id: String) {
     }
 
     private fun mTerminate(socket: Socket) {
+        Status.mDelete
+        Log.i("challengeResponse", "terminate received")
         isValidated = false
         socket.emit(
             "sendTo", createMessage(
@@ -150,6 +175,16 @@ class ChallengeResponse(private val id: String) {
     }
 
     private fun ping(id: String, socket: Socket) {
+//        if (Timer.mCountDownTimer != null){
+//            run
+//        }else{
+//            Log.i("secondsRemaining","i am null")
+        if (Status.isDisconnected){
+            socket.disconnect()
+        }
+//        }
+        Status.setTime(Calendar.getInstance().time)
+        Log.i("challengeResponse", "ping received")
         Handler(Looper.getMainLooper()).postDelayed({
             socket.emit(
                 "sendTo", createMessage(
@@ -162,7 +197,7 @@ class ChallengeResponse(private val id: String) {
                     )!!
                 )
             )
-        }, 10*1000)
+        }, 5 * 1000)
     }
 
     private fun createMessage(id: String, message: String): JSONObject {
@@ -175,6 +210,5 @@ class ChallengeResponse(private val id: String) {
         }
         return jsonObject
     }
-
 
 }

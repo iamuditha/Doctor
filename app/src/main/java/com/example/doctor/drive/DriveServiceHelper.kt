@@ -1,8 +1,9 @@
-package com.example.doctor
+package com.example.doctor.drive
 
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
@@ -101,6 +102,34 @@ class DriveServiceHelper(private val mDriveService: Drive) {
             pageToken = result.nextPageToken
         } while (pageToken != null)
         return result.files
+    }
+
+    // upload a file in to google drive
+    fun uploadFileToAppDataFolder(fileInputStream: ByteArray, mimeType: String?, folderId: String?, filename: String?): Task<Any>? {
+        return Tasks.call(mExecutor, Callable<Any> { // Retrieve the metadata as a File object.
+            val root: List<String> = folderId?.let { listOf(it) } ?: listOf("root")
+            val metadata = File()
+                .setParents(root)
+                .setMimeType(mimeType)
+                .setName(filename)
+            val fileMeta = mDriveService.files().create(
+                metadata,
+                ByteArrayContent("json/application",fileInputStream)
+            ).execute()
+
+
+//            val permission = Permission().setType("anyone").setRole("reader")
+
+//            mDriveService.Permissions().create(fileMeta.id,permission).execute()
+
+            val link = mDriveService.files().get(fileMeta.id).setFields("webContentLink").execute()
+
+            val googleDriveFileHolder = GoogleDriveFileHolder()
+            googleDriveFileHolder.setId(fileMeta.id)
+            googleDriveFileHolder.setName(fileMeta.name)
+            googleDriveFileHolder.setWebContentLink(link.webContentLink)
+            googleDriveFileHolder
+        })
     }
 
     // upload a file in to google drive

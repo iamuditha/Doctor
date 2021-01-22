@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Doctor</string>
-    <string name="main_contractor_address">"0x5927f972da4bd51f25e6537749be54df871a871b"</string>
+    <string name="main_contractor_address">0xae4d6b9740228849d393bbb89a18e74d0e55a47d</string>
     <string name="title_activity_drawer">DrawerActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

@@ -1,12 +1,14 @@
 package com.example.doctor
 
+import ContractorHandlers.IAMContractorHandler
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.app.ProgressDialog
+import android.content.*
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -14,12 +16,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.content.ContextCompat.startActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.example.doctor.challangeResponse.ChallengeResponse
 import com.example.doctor.challangeResponse.challangeResponseService
-import com.example.doctor.qr.QRActivity
+import com.example.doctor.drive.DriveServiceHelper
+import com.example.doctor.objects.Status
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.Scopes
@@ -30,14 +33,20 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import crypto.PublicPrivateKeyPairGenerator
 import crypto.did.DID
 import crypto.did.DIDDocument
 import crypto.did.DIDDocumentGenerator
+import javaethereum.contracts.generated.IAMContract
 import kotlinx.android.synthetic.main.activity_doctor_register.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.json.JSONObject
 import org.web3j.crypto.CipherException
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.WalletUtils
+import org.web3j.protocol.Web3j
+import org.web3j.protocol.http.HttpService
 import java.io.*
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
@@ -46,8 +55,6 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
 import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 
@@ -59,17 +66,26 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
     private var SCOPE_APP_DATA = Scope(Scopes.DRIVE_APPFOLDER)
     private var googleDriveService: Drive? = null
     private var mDriveServiceHelper: DriveServiceHelper? = null
-    private val mExecutor: Executor = Executors.newSingleThreadExecutor()
     private var list: List<String> = ArrayList()
     private val REQUEST_IMAGE_CAPTURE: Int = 100
 
-    val alertDialogUtility = AlertDialogUtility
+    lateinit var progressKeyUploading: ProgressDialog
+
+    var handler: Handler = Handler()
+    var runnable: Runnable? = null
+    var delay = 2 * 1000 //Delay fo
 
 
     //configure the google sign in
     var gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
         .build()
+
+    private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+//            statusmy.text = "CONNECTED"
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,22 +100,31 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
         isDIDDocumentInThePhone()
 
         getPermission()
-
-        choose.setOnClickListener {
-            filePicker()
-            alertDialogUtility.alertDialog(this, "Uploading....", 1)
-
+        if (!Status.mStatus) {
+//            statusmy.text = "DISCONNECTED"
         }
 
-        write.setOnClickListener {
-            try {
-                val challengeResponse = ChallengeResponse("mydid")
+        progressKeyUploading = displayLoading(this, "Generating your Key Pair. Please Wait.....")
 
-                challengeResponse.challengeResponse()
-            } catch (e: Exception) {
-                Log.i("ooops", e.toString())
-            }
+        val thread = Thread{
+            verifyEmail()
         }
+        thread.start()
+//        choose.setOnClickListener {
+//            filePicker()
+//            alertDialogUtility.alertDialog(this, "Uploading....", 1)
+//
+//        }
+
+//        write.setOnClickListener {
+//            try {
+//                val challengeResponse = ChallengeResponse("mydid", context)
+//
+//                challengeResponse.challengeResponse()
+//            } catch (e: Exception) {
+//                Log.i("ooops", e.toString())
+//            }
+//        }
 
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
 
@@ -117,34 +142,28 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
 
 //        alertDialogUtility.alertDialog(this, "Uploading....", 1)
 
-        var prefs: SharedPreferences = getSharedPreferences("PROFILE_DATA", MODE_PRIVATE)
-        var name: String? = prefs.getString("name", "No name defined")
-        var email: String? = prefs.getString("email", "no email")
-        var url: String? = prefs.getString("url", "no url")
+        val prefs: SharedPreferences = getSharedPreferences("PROFILE_DATA", MODE_PRIVATE)
+        val name: String? = prefs.getString("name", "No name defined")
+        val email: String? = prefs.getString("email", "no email")
+        val url: String? = prefs.getString("url", "no url")
 
         val navigationView: NavigationView = findViewById<View>(R.id.nav_view) as NavigationView
         val headerView: View = navigationView.getHeaderView(0)
         val navUsername = headerView.findViewById(R.id.doctorName) as TextView
-        val navUseremail = headerView.findViewById(R.id.doctorEmail) as TextView
+        val navUserEmail = headerView.findViewById(R.id.doctorEmail) as TextView
         val navUserImage = headerView.findViewById(R.id.doctorImage) as ImageView
 
 
         navUsername.text = name
-        navUseremail.text = email
+        navUserEmail.text = email
         Glide.with(this).load(url).apply(RequestOptions.circleCropTransform()).into(navUserImage)
-
-
-
         Log.i("sharedData", "$name $email $url")
 
-        write.setOnClickListener{
-            val intent1 = Intent(baseContext, challangeResponseService::class.java)
-            startService(intent1)
-        }
+//        write.setOnClickListener{
+//            val intent1 = Intent(baseContext, challangeResponseService::class.java)
+//            startService(intent1)
+//        }
 
-
-        // Build a GoogleSignInClient with the options specified by gso.
-        val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
         //randomly generated string for the DID
         val myPublicKey = UUID.randomUUID().toString().substring(0, 8)
@@ -152,10 +171,16 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
         Log.i("did", filesDir.absolutePath)
 
 
-        button.setOnClickListener {
-            val intent = Intent(this, QRActivity::class.java)
-            intent.putExtra("did", "this is a did")
-            startActivity(intent)
+        register.setOnClickListener {
+            progressKeyUploading.show()
+            registerForFirstTime()
+        }
+
+//
+//        button.setOnClickListener {
+//            val intent = Intent(this, QRActivity::class.java)
+//            intent.putExtra("did", "this is a did")
+//            startActivity(intent)
 
 //            val thread = Thread{
 //
@@ -244,9 +269,7 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
 //            }
 
 
-        }
-
-
+//        }
 
 
         //upload did to drive
@@ -255,6 +278,60 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
 
         //upload the link to the block chain
     }
+
+    //display loading dialog
+    private fun displayLoading(context: Context, message: String): ProgressDialog {
+        val progress = ProgressDialog(context)
+        progress.setMessage(message)
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        progress.isIndeterminate = true
+        progress.setCancelable(false)
+        return progress
+    }
+
+    //called when registering for the first time
+    private fun registerForFirstTime() {
+        val key = PublicPrivateKeyPairGenerator.getInstance().generateRSAKeyPair()
+        val encodedPublicKey = Base64.getEncoder().encodeToString(key.public.encoded)
+        val encodedPrivateKey = Base64.getEncoder().encodeToString(key.private.encoded)
+        val myKeyPair = KeyPair(encodedPrivateKey, encodedPublicKey)
+        val obj = Gson().toJson(myKeyPair)
+        Log.i("keysUploading", "i am called $obj")
+        uploadFileToDrive(obj.toByteArray(),encodedPublicKey)
+
+    }
+
+    //send an email
+    private fun sendEmail(publicKey: String){
+        val selectorIntent = Intent(Intent.ACTION_SENDTO)
+        selectorIntent.data = Uri.parse("mailto:")
+
+        val emailIntent = Intent(Intent.ACTION_SEND)
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("udithaanuranjana25@gmail.com"))
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Public Key")
+        emailIntent.putExtra(Intent.EXTRA_TEXT, publicKey)
+        emailIntent.selector = selectorIntent
+
+        startActivity(Intent.createChooser(emailIntent, "Send email..."))
+    }
+
+    //verify the email
+    private fun verifyEmail(){
+        val web3j: Web3j = Web3j.build(HttpService("https://c4375655a390.ngrok.io"))
+        val credentials = WalletUtils.loadBip39Credentials("123456",UUID.randomUUID().toString())
+        val iamContract = IAMContractorHandler.getInstance().getWrapperForContractor(web3j,getString(R.string.main_contractor_address),credentials)
+        val email = IAMContractorHandler.getInstance().getDoctorEmail(iamContract,"did:medico:zDAGrw6sTxV6RXrJiIFZa7w2HCF0jX1WxcA0=")
+        Log.i("blockchain",email)
+        web3j.shutdown()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.example.doctor")
+        registerReceiver(broadcastReceiver, intentFilter)
+    }
+
     private fun filePicker() {
         var chooseFile = Intent(Intent.ACTION_GET_CONTENT)
         chooseFile.type = "*/*"
@@ -279,8 +356,9 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 999 && resultCode == Activity.RESULT_OK && data!= null){
-            val destination =  File(Environment.getExternalStorageDirectory().absolutePath + "/filenamehjkl.txt");
+        if (requestCode == 999 && resultCode == Activity.RESULT_OK && data != null) {
+            val destination =
+                File(Environment.getExternalStorageDirectory().absolutePath + "/filenamehjkl.txt");
             val newDestination = File(applicationContext.filesDir.absolutePath + "/didDocument.txt")
 
             val `in` = contentResolver.openInputStream(data.data!!)
@@ -307,7 +385,6 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
             return did
 
         } catch (e: NoSuchAlgorithmException) {
-//            e.printStackTrace()
             Log.i("did", "error..............")
             return e.message
         }
@@ -513,21 +590,46 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
     }
 
     //upload a file to the drive
-    private fun uploadFileToDrive() {
-        val file = File(applicationContext.filesDir, "didDocument.txt")
-        mDriveServiceHelper!!.uploadFile(file, "application/json", null)
+    private fun uploadFileToDrive(byteArray: ByteArray,key:String) {
+
+        mDriveServiceHelper!!.uploadFileToAppDataFolder(
+            byteArray,
+            "application/json",
+            null,
+            "myKeys.json"
+        )
             ?.addOnSuccessListener { googleDriveFileHolder ->
-                val gson = Gson()
+                val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
+                val v = gson.toJson(googleDriveFileHolder)
+                val obj = JSONObject(v)
+//                Log.i("fileUploading", obj["webContentLink"].toString())
                 Log.i(
-                    "logininfo",
+                    "fileUploading",
                     "on success File upload" + gson.toJson(googleDriveFileHolder)
                 )
+                sendEmail(key)
+                runOnUiThread {
+                    progressKeyUploading.dismiss()
+                }
+                Toast.makeText(this, "Successfully Uploaded", Toast.LENGTH_SHORT).show()
+
+//                goToNextActivity()
+
             }
             ?.addOnFailureListener { e ->
                 Log.i(
-                    "logininfo",
+                    "fileUploading",
                     "on failure of file upload" + e.message
                 )
+                runOnUiThread {
+                    progressKeyUploading.dismiss()
+                }
+                Toast.makeText(
+                    this,
+                    "Could Not Create Your File. Please Check Your Connection and Try Again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+
             }
     }
 
@@ -553,32 +655,13 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
             //show popup to request permission
             requestPermissions(permission, REQUEST_IMAGE_CAPTURE)
 
-        } else {
-            //permission already granted
-//            val path = Environment.getExternalStorageDirectory().toString() +"/Eee.jpg/"
-
-//            try {
-//                val fileOutputStream = FileInputStream(path)
-//                Log.i("encrypting", "image found")
-//
-//                val suc = Encdec().encryptFile(
-//                    fileOutputStream,
-//                    Environment.getExternalStorageDirectory().toString()
-//                )
-//                Log.i("encrypting", suc.toString())
-//
-//            }catch (e: Exception){
-//                Log.i("encrypting", e.toString())
-//            }
-
-
         }
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         Log.i("drawerfunctions", "asdfghj")
         when (item!!.itemId) {
-            R.id.recordList -> {
+            R.id.mLogout -> {
                 Toast.makeText(this, "Logout Successfully hahaha", Toast.LENGTH_SHORT).show()
                 Log.i("drawerfunctions", "I am clicked")
                 return true
@@ -605,13 +688,56 @@ class DoctorRegisterActivity : BaseActivity(), MenuItem.OnMenuItemClickListener 
             try {
                 out?.close()
 
-                // If you want to close the "in" InputStream yourself then remove this
-                // from here but ensure that you close it yourself eventually.
                 `in`.close()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
+    }
+
+    override fun onResume() {
+        //start handler as activity become visible
+        handler.postDelayed(Runnable {
+            if (Status.mStatus) {
+//                statusmy.text = "CONNECTED"
+                val currentTime = Calendar.getInstance().time.time
+                val difference = currentTime - Status.mTime.time
+                Log.i("settimermy", difference.toString())
+
+                if (difference > 15000) {
+                    Log.i("settimermy", "timere d fjgdfskndvsbgfmds")
+                    Status.disConnect()
+                    val intent1 = Intent(baseContext, challangeResponseService::class.java)
+                    stopService(intent1)
+                    Status.isDisconnected = true
+                }
+
+            } else {
+//                statusmy.text = "DISCONNECTED"
+            }
+            if (Status.mDelete) {
+                deleteImages()
+            }
+            handler.postDelayed(runnable, delay.toLong())
+        }.also { runnable = it }, delay.toLong())
+        super.onResume()
+    }
+
+
+    private fun deleteImages() {
+        val path = Environment.getExternalStorageDirectory().toString() + "/Pictures"
+        Log.d("myFiles", "Path: $path")
+        val directory = File(path)
+        val files = directory.listFiles()
+        Log.d("myFiles", "Size: " + files.size)
+        for (i in files.indices) {
+            Log.d("Files", "FileName:" + files[i].name)
+        }
+    }
+
+    override fun onPause() {
+        handler.removeCallbacks(runnable) //stop handler when activity not visible
+        super.onPause()
     }
 }
 
